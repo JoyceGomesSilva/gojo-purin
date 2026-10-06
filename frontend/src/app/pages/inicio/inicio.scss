@@ -1,33 +1,32 @@
 .abertura {
-  padding: 28px 0 20px;
+  padding: 40px 0 32px;
   max-width: 46rem;
 
   h1 {
     font-family: var(--gp-fonte-titulo);
     font-weight: 400;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
-    margin: 0 0 14px;
-    color: var(--gp-caramelo);
+    font-size: clamp(2rem, 5.5vw, 3.25rem);
+    line-height: 1.15;
+    margin: 0 0 20px;
+    color: var(--gp-tinta);
     text-wrap: balance;
   }
 
   p {
-    font-size: 1.1rem;
-    line-height: 1.55;
+    font-size: 1.15rem;
+    line-height: 1.65;
     margin: 0;
     max-width: 34rem;
+    color: var(--gp-tinta-suave);
   }
 }
 
 // Filtros: uma fileira que rola para o lado no celular.
 .filtros {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   overflow-x: auto;
-  padding: 12px 0 14px;
-  margin-bottom: 4px;
+  padding: 8px 0 16px;
   scrollbar-width: thin;
 }
 
@@ -35,41 +34,65 @@
   flex: none;
   font: inherit;
   font-weight: 700;
-  padding: 8px 16px;
-  border: 2px solid var(--gp-caramelo);
+  padding: 10px 20px;
+  border: 2px solid var(--gp-linha);
   border-radius: 999px;
-  background: transparent;
-  color: var(--gp-caramelo);
+  background: var(--gp-papel);
+  color: var(--gp-tinta);
   cursor: pointer;
 
   &:hover {
-    background: var(--gp-creme);
+    background: var(--gp-azul);
+    border-color: var(--gp-azul);
   }
 
   &.ativo {
-    background: var(--gp-caramelo);
-    color: var(--gp-custard);
+    background: var(--gp-tinta);
+    border-color: var(--gp-tinta);
+    color: #ffffff;
   }
 }
 
+// Cada secao do cardapio recebe um dos quatro pasteis, em rodizio.
+// A variavel --cor pinta o fundo da foto e a sombra dos cartoes daquela secao.
 .secao {
-  margin-top: 28px;
+  --cor: var(--gp-azul);
+  margin-top: 64px;
+
+  &:nth-of-type(4n + 2) {
+    --cor: var(--gp-rosa);
+  }
+
+  &:nth-of-type(4n + 3) {
+    --cor: var(--gp-amarelo);
+  }
+
+  &:nth-of-type(4n + 4) {
+    --cor: var(--gp-menta);
+  }
 
   h2 {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
+    align-items: center;
+    gap: 16px;
     font-family: var(--gp-fonte-titulo);
     font-weight: 400;
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     line-height: 1.2;
-    margin: 0 0 16px;
-    color: var(--gp-caramelo);
+    margin: 0 0 28px;
+    color: var(--gp-tinta);
   }
 
+  // O ideograma fica dentro de uma bolinha na cor da secao.
   .kanji {
-    font-size: 2.2rem;
-    color: var(--gp-azul);
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--cor);
+    font-size: 1.6rem;
+    line-height: 1;
   }
 }
 
@@ -78,27 +101,27 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 36px 32px;
 }
 
-// Cada prato e um "tiquete de refeicao": papel creme, contorno e sombra seca.
+// Cartao do prato: papel branco, cantos redondos e uma sombra na cor da secao.
 .prato {
   display: flex;
   flex-direction: column;
   height: 100%;
   color: inherit;
   text-decoration: none;
-  background: var(--gp-creme);
-  border: 2px solid var(--gp-caramelo);
-  border-radius: 6px;
-  box-shadow: 5px 5px 0 var(--gp-caramelo);
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+  box-shadow: 8px 8px 0 var(--cor);
   overflow: hidden;
   transition: transform 120ms ease, box-shadow 120ms ease;
 
   &:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 var(--gp-caramelo);
+    box-shadow: 10px 10px 0 var(--cor);
   }
 }
 
@@ -106,8 +129,7 @@
   aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
-  background: var(--gp-custard-forte);
-  border-bottom: 2px solid var(--gp-caramelo);
+  background: var(--cor);
 
   img {
     width: 100%;
@@ -119,69 +141,182 @@
     font-family: var(--gp-fonte-titulo);
     font-size: 5rem;
     line-height: 1;
-    color: var(--gp-caramelo);
-    opacity: 0.85;
+    color: var(--gp-tinta);
+    opacity: 0.45;
   }
 }
 
 .texto {
   flex: 1;
-  padding: 14px 16px 6px;
+  padding: 24px 24px 8px;
 
   h3 {
     font-family: var(--gp-fonte-titulo);
     font-weight: 400;
-    font-size: 1.1rem;
-    line-height: 1.25;
-    margin: 0 0 4px;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin: 0 0 8px;
   }
 }
 
 .origem {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--gp-azul);
+  color: var(--gp-rosa-forte);
 }
 
 .descricao {
   margin: 0;
-  font-size: 0.92rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--gp-tinta-suave);
 }
 
 .rodape {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  padding: 10px 16px 14px;
+  padding: 16px 24px 24px;
 }
 
 .preco {
   font-family: var(--gp-fonte-titulo);
   font-size: 1.2rem;
-  color: var(--gp-caramelo);
+  color: var(--gp-tinta);
 }
 
 .tempo {
   font-size: 0.85rem;
   font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--gp-fundo);
+  color: var(--gp-tinta-suave);
+}
+
+// Combos: cartoes mais largos, com fundo pastel, para se destacarem dos pratos.
+.combos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 36px 32px;
+}
+
+.combo {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 28px;
+  color: var(--gp-tinta);
+  text-decoration: none;
+  background: var(--gp-azul);
+  border-radius: 24px;
+  transition: transform 120ms ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  h3 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: 1.4rem;
+    line-height: 1.25;
+    margin: 0 0 12px;
+  }
+
+  .descricao {
+    flex: 1;
+    color: var(--gp-tinta);
+  }
+
+  .selo {
+    align-self: flex-start;
+    margin: 0 0 16px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: var(--gp-papel);
+    color: var(--gp-rosa-forte);
+  }
+
+  .itens {
+    margin: 20px 0 0;
+    padding-top: 16px;
+    border-top: 2px dashed rgba(58, 53, 88, 0.2);
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .valores {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 16px 0 0;
+
+    s {
+      color: var(--gp-tinta-suave);
+    }
+  }
+
+  .preco {
+    font-size: 1.4rem;
+  }
+}
+
+// Cada combo pega um pastel diferente; o "monte o seu" fica branco com contorno.
+.combos li:nth-child(4n + 2) .combo {
+  background: var(--gp-rosa);
+}
+
+.combos li:nth-child(4n + 3) .combo {
+  background: var(--gp-amarelo);
+}
+
+.combos li:nth-child(4n + 4) .combo {
+  background: var(--gp-menta);
+}
+
+.combos li .combo.montavel {
+  background: var(--gp-papel);
+  border: 2px dashed var(--gp-primaria);
+
+  .preco {
+    color: var(--gp-primaria);
+  }
 }
 
 .estado {
-  margin: 40px 0;
+  margin: 64px 0;
   text-align: center;
   font-size: 1.05rem;
 
   p {
     max-width: 32rem;
-    margin: 0 auto 16px;
-    line-height: 1.5;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 640px) {
+  .secao {
+    margin-top: 48px;
+  }
+
+  .pratos,
+  .combos {
+    gap: 28px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prato {
+  .prato,
+  .combo {
     transition: none;
   }
 }

@@ -1,0 +1,74 @@
+// Cada grupo de complementos e um bloco proprio, com bastante respiro.
+.grupo {
+  margin: 0 0 24px;
+  padding: 20px 24px 12px;
+  border: 2px solid var(--gp-linha);
+  border-radius: 20px;
+  background: var(--gp-papel);
+  min-width: 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+}
+
+.nome {
+  font-weight: 700;
+  font-size: 1.02rem;
+}
+
+.regra {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--gp-menta);
+  color: var(--gp-tinta);
+
+  &.obrigatorio {
+    background: var(--gp-rosa);
+  }
+}
+
+.opcao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  cursor: pointer;
+
+  & + .opcao {
+    border-top: 1px solid var(--gp-linha);
+  }
+
+  input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--gp-primaria);
+    cursor: inherit;
+  }
+
+  &.bloqueada {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.texto {
+  flex: 1;
+}
+
+.mais {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gp-tinta-suave);
+  white-space: nowrap;
+}

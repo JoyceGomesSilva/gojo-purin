@@ -1,0 +1,24 @@
+@for (grupo of grupos(); track grupo.id) {
+  <fieldset class="grupo">
+    <legend>
+      <span class="nome">{{ grupo.nome }}</span>
+      <span class="regra" [class.obrigatorio]="grupo.obrigatorio">{{ regra(grupo) }}</span>
+    </legend>
+
+    @for (opcao of grupo.opcoes; track opcao.id) {
+      <label class="opcao" [class.bloqueada]="bloqueada(grupo, opcao.id)">
+        <input
+          [type]="unica(grupo) ? 'radio' : 'checkbox'"
+          [name]="prefixo() + '-' + grupo.id"
+          [checked]="marcada(grupo, opcao.id)"
+          [disabled]="bloqueada(grupo, opcao.id)"
+          (change)="alternar(grupo, opcao.id)"
+        />
+        <span class="texto">{{ opcao.nome }}</span>
+        @if (opcao.precoAdicional > 0) {
+          <span class="mais">+ {{ opcao.precoAdicional | brl }}</span>
+        }
+      </label>
+    }
+  </fieldset>
+}

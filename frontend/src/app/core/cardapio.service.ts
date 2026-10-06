@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Categoria, Pagina, PratoCardapio } from './models';
+import { Categoria, Combo, Pagina, PratoCardapio, PratoDetalhe } from './models';
 
 // Conversa com /api/cardapio (endpoints publicos, sem login).
 @Injectable({ providedIn: 'root' })
@@ -23,7 +23,16 @@ export class CardapioService {
     return this.http.get<Pagina<PratoCardapio>>(this.url, { params });
   }
 
-  prato(id: number): Observable<PratoCardapio> {
-    return this.http.get<PratoCardapio>(`${this.url}/${id}`);
+  // Detalhe do prato, com os grupos de complementos.
+  prato(id: number): Observable<PratoDetalhe> {
+    return this.http.get<PratoDetalhe>(`${this.url}/${id}`);
+  }
+
+  combos(): Observable<Combo[]> {
+    return this.http.get<Combo[]>(`${this.url}/combos`);
+  }
+
+  combo(id: number): Observable<Combo> {
+    return this.http.get<Combo>(`${this.url}/combos/${id}`);
   }
 }

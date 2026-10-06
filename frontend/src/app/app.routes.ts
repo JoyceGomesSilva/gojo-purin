@@ -14,6 +14,20 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/prato/prato').then((m) => m.PratoDetalhe)
   },
   {
+    path: 'combo/:id',
+    loadComponent: () => import('./pages/combo/combo').then((m) => m.ComboPagina)
+  },
+  {
+    path: 'carrinho',
+    loadComponent: () => import('./pages/carrinho/carrinho').then((m) => m.Carrinho)
+  },
+  {
+    // So clientes logados fecham pedido.
+    path: 'checkout',
+    canActivate: [authGuard, roleGuard('CLIENTE')],
+    loadComponent: () => import('./pages/checkout/checkout').then((m) => m.Checkout)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login)
   },

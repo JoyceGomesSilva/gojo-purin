@@ -1,15 +1,17 @@
 // Estilo compartilhado pelas telas de login e de cadastro.
 .auth-card {
-  max-width: 440px;
-  margin: 24px auto;
-  padding: 8px;
+  max-width: 460px;
+  margin: 48px auto;
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 8px 8px 0 var(--gp-azul);
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 28px;
 }
 
 mat-form-field {
@@ -17,12 +19,12 @@ mat-form-field {
 }
 
 .enviar {
-  margin-top: 8px;
-  height: 48px;
+  margin-top: 12px;
+  height: 52px;
 }
 
 .rodape {
-  margin: 16px 0 0;
+  margin: 28px 0 0;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }

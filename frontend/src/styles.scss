@@ -1,7 +1,15 @@
 // ===================================================================
-// Identidade visual do Gojo Purin
-// Cole este bloco NO FINAL do arquivo frontend/src/styles.scss
+// Identidade visual do Gojo Purin (tons pastel)
+// Este bloco fica NO FINAL do arquivo frontend/src/styles.scss
 // ===================================================================
+
+// Faz largura e altura incluirem o preenchimento e a borda. Sem isso, um
+// cartao com "height: 100%" e padding fica maior que o espaco dele.
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 // O site e sempre claro, mesmo se o computador estiver em modo escuro.
 html {
@@ -9,30 +17,38 @@ html {
 }
 
 body {
-  // Cores: o pudim (purin) e a calda de caramelo, com o azul como destaque.
-  --gp-custard: #ffe9a6;       // fundo: o creme do pudim
-  --gp-custard-forte: #ffd766; // fundo das fotos ainda sem imagem
-  --gp-creme: #fff8e0;         // papel dos cartoes
-  --gp-caramelo: #5b2a0e;      // calda: topo, titulos, contornos
-  --gp-caramelo-claro: #96501b;
-  --gp-tinta: #2b1406;         // texto
-  --gp-azul: #1846d1;          // acoes e destaques
+  // Fundo e texto
+  --gp-fundo: #ffeaf2;       // rosa pastel;       
+  --gp-papel: #ffffff;       // cartoes
+  --gp-tinta: #3a3558;       // texto: um anil suave, no lugar do preto
+  --gp-tinta-suave: #6d6890; // textos secundarios
+  --gp-linha: #e7def3;       // contornos e divisorias
+
+  // Os quatro pasteis. Cada secao do cardapio usa um deles.
+  --gp-azul: #c3e4ff;
+  --gp-rosa: #ffd3e3;
+  --gp-amarelo: #ffeeb3;
+  --gp-menta: #cdf3df;
+
+  // Cores de acao (mais fortes, para dar leitura em botoes e etiquetas)
+  --gp-primaria: #4a78d6;
+  --gp-rosa-forte: #c2457a;
 
   --gp-fonte-titulo: 'Dela Gothic One', 'Zen Maru Gothic', sans-serif;
   --gp-fonte-texto: 'Zen Maru Gothic', system-ui, sans-serif;
 
   // Faz os componentes do Angular Material usarem as mesmas cores e fonte.
-  --mat-sys-primary: var(--gp-azul);
+  --mat-sys-primary: var(--gp-primaria);
   --mat-sys-on-primary: #ffffff;
-  --mat-sys-background: var(--gp-custard);
+  --mat-sys-background: var(--gp-fundo);
   --mat-sys-on-background: var(--gp-tinta);
-  --mat-sys-surface: var(--gp-creme);
+  --mat-sys-surface: var(--gp-papel);
   --mat-sys-on-surface: var(--gp-tinta);
-  --mat-sys-on-surface-variant: #6b4226;
-  --mat-sys-surface-container-low: var(--gp-creme);
-  --mat-sys-surface-container: var(--gp-creme);
-  --mat-sys-outline: #9a7b5a;
-  --mat-sys-outline-variant: #d9bf8f;
+  --mat-sys-on-surface-variant: var(--gp-tinta-suave);
+  --mat-sys-surface-container-low: var(--gp-papel);
+  --mat-sys-surface-container: var(--gp-papel);
+  --mat-sys-outline: #a79fc4;
+  --mat-sys-outline-variant: var(--gp-linha);
   --mat-sys-body-large-font: var(--gp-fonte-texto);
   --mat-sys-body-medium-font: var(--gp-fonte-texto);
   --mat-sys-body-small-font: var(--gp-fonte-texto);
@@ -42,18 +58,19 @@ body {
   --mat-sys-title-small-font: var(--gp-fonte-texto);
 
   margin: 0;
-  background: var(--gp-custard);
+  background: var(--gp-fundo);
   color: var(--gp-tinta);
   font-family: var(--gp-fonte-texto);
   font-weight: 500;
+  line-height: 1.6;
 }
 
 a {
-  color: var(--gp-azul);
+  color: var(--gp-primaria);
 }
 
 // Contorno bem visivel para quem navega pelo teclado.
 :focus-visible {
-  outline: 3px solid var(--gp-azul);
-  outline-offset: 2px;
+  outline: 3px solid var(--gp-primaria);
+  outline-offset: 3px;
 }

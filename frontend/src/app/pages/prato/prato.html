@@ -55,10 +55,18 @@
             </div>
           </div>
 
+          @if (p.gruposOpcoes.length > 0) {
+            <app-escolha-opcoes [grupos]="p.gruposOpcoes" [(selecao)]="selecao" />
+          }
+
           <mat-form-field appearance="outline">
             <mat-label>Observações</mat-label>
             <input matInput [formControl]="observacoes" placeholder="Ex.: sem cebola" maxlength="255" />
           </mat-form-field>
+
+          @if (pendentes().length > 0) {
+            <p class="falta">Falta escolher: {{ pendentes().join(', ') }}</p>
+          }
 
           <button mat-flat-button class="adicionar" type="button" (click)="adicionar()">
             Adicionar ao carrinho ({{ subtotal() | brl }})

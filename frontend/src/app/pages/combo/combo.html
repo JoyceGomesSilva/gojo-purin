@@ -1,0 +1,130 @@
+<a class="voltar" routerLink="/">Voltar ao cardápio</a>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando o combo...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Este combo não está disponível agora.</p>
+    <a mat-flat-button routerLink="/">Ver o cardápio</a>
+  </div>
+} @else {
+  @if (combo(); as c) {
+    <header class="cabecalho">
+      <p class="selo">{{ c.descontoPercentual }}% de desconto</p>
+      <h1>{{ c.nome }}</h1>
+      <p class="descricao">{{ c.descricao }}</p>
+    </header>
+
+    <div class="colunas">
+      <div class="etapas">
+        @for (etapa of c.etapas; track etapa.id) {
+          <section class="etapa">
+            <h2>
+              {{ etapa.nome }}
+              <span class="regra" [class.obrigatoria]="etapa.obrigatoria">
+                {{ etapa.obrigatoria ? 'Obrigatória' : 'Opcional' }}
+              </span>
+            </h2>
+
+            @if (fixa(etapa)) {
+              <p class="fixo">
+                <span class="nome">{{ etapa.pratos[0].nome }}</span>
+                <span class="precos">
+                  <s>{{ etapa.pratos[0].preco | brl }}</s>
+                  <strong>{{ comDesconto(etapa.pratos[0].preco) | brl }}</strong>
+                </span>
+              </p>
+            } @else {
+              <div class="lista" role="radiogroup" [attr.aria-label]="etapa.nome">
+                @if (!etapa.obrigatoria) {
+                  <label class="escolha">
+                    <input
+                      type="radio"
+                      [name]="'etapa-' + etapa.id"
+                      [checked]="escolhas()[etapa.id] == null"
+                      (change)="escolher(etapa, null)"
+                    />
+                    <span class="nome">Não quero</span>
+                  </label>
+                }
+                @for (prato of etapa.pratos; track prato.id) {
+                  <label class="escolha">
+                    <input
+                      type="radio"
+                      [name]="'etapa-' + etapa.id"
+                      [checked]="escolhas()[etapa.id] === prato.id"
+                      (change)="escolher(etapa, prato.id)"
+                    />
+                    <span class="nome">{{ prato.nome }}</span>
+                    <span class="precos">
+                      <s>{{ prato.preco | brl }}</s>
+                      <strong>{{ comDesconto(prato.preco) | brl }}</strong>
+                    </span>
+                  </label>
+                }
+              </div>
+            }
+
+            @if (detalheDaEtapa(etapa); as detalhe) {
+              @if (detalhe.gruposOpcoes.length > 0) {
+                <div class="complementos">
+                  <app-escolha-opcoes
+                    [grupos]="detalhe.gruposOpcoes"
+                    [prefixo]="'etapa-' + etapa.id + '-grupo'"
+                    [selecao]="selecoes()[etapa.id] ?? {}"
+                    (selecaoChange)="definirSelecao(etapa.id, $event)"
+                  />
+                </div>
+              }
+            }
+          </section>
+        }
+      </div>
+
+      <aside class="resumo" aria-label="Resumo do combo">
+        <h2>Seu combo</h2>
+
+        @if (linhas().length === 0) {
+          <p class="vazio">Escolha os pratos para ver o preço.</p>
+        } @else {
+          <ul>
+            @for (linha of linhas(); track linha.etapa.id) {
+              <li>
+                <div class="linha">
+                  <span>{{ linha.prato.nome }}</span>
+                  <span>{{ linha.precoFinal | brl }}</span>
+                </div>
+                @if (linha.opcoes.length > 0) {
+                  <p class="detalhes">
+                    @for (opcao of linha.opcoes; track opcao.id; let ultima = $last) {
+                      {{ opcao.nome }}{{ ultima ? '' : ', ' }}
+                    }
+                  </p>
+                }
+              </li>
+            }
+          </ul>
+
+          <dl class="totais">
+            <div>
+              <dt>Sem combo</dt>
+              <dd><s>{{ totalCheio() | brl }}</s></dd>
+            </div>
+            <div class="final">
+              <dt>Com o combo</dt>
+              <dd>{{ total() | brl }}</dd>
+            </div>
+          </dl>
+        }
+
+        @if (pendencias().length > 0) {
+          <p class="falta">Falta escolher: {{ pendencias().join(', ') }}</p>
+        }
+
+        <button mat-flat-button class="adicionar" type="button" (click)="adicionar()">
+          Adicionar combo ao carrinho
+        </button>
+      </aside>
+    </div>
+  }
+}

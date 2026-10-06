@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { BrlPipe } from '../../core/brl.pipe';
 import { CardapioService } from '../../core/cardapio.service';
 import { kanjiDaCategoria } from '../../core/categoria-kanji';
-import { Categoria, PratoCardapio } from '../../core/models';
+import { Categoria, Combo, PratoCardapio } from '../../core/models';
 
 interface Secao {
   nome: string;
@@ -24,6 +24,7 @@ export class Inicio {
 
   protected categorias = signal<Categoria[]>([]);
   protected pratos = signal<PratoCardapio[]>([]);
+  protected combos = signal<Combo[]>([]);
   protected categoriaId = signal<number | null>(null);
 
   protected carregando = signal(true);
@@ -51,7 +52,17 @@ export class Inicio {
       next: (categorias) => this.categorias.set(categorias),
       error: () => this.categorias.set([])
     });
+    // Os combos aparecem no topo do cardapio. Se a busca falhar, a secao so nao aparece.
+    this.cardapio.combos().subscribe({
+      next: (combos) => this.combos.set(combos),
+      error: () => this.combos.set([])
+    });
     this.buscar();
+  }
+
+  // Nomes dos pratos de um combo pronto, para o resumo do cartao.
+  protected pratosDoCombo(combo: Combo): string {
+    return combo.etapas.map((etapa) => etapa.pratos[0]?.nome).join(' + ');
   }
 
   filtrar(categoriaId: number | null): void {

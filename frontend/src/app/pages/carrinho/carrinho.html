@@ -1,0 +1,97 @@
+<h1>Carrinho</h1>
+
+@if (carrinho.itens().length === 0) {
+  <div class="vazio">
+    <p>Seu carrinho está vazio. Escolha um prato ou um combo no cardápio.</p>
+    <a mat-flat-button routerLink="/">Ver o cardápio</a>
+  </div>
+} @else {
+  <div class="colunas">
+    <div class="itens">
+      @for (grupo of combos(); track grupo.chave) {
+        <section class="bloco combo">
+          <header class="bloco-topo">
+            <h2>{{ grupo.nome }}</h2>
+            <button type="button" class="remover" (click)="removerCombo(grupo)">Remover combo</button>
+          </header>
+
+          <ul>
+            @for (linha of grupo.linhas; track linha.posicao) {
+              <li class="linha">
+                <div class="descricao">
+                  <p class="nome">{{ linha.item.nome }}</p>
+                  @if (linha.item.opcoes.length > 0) {
+                    <p class="detalhe">{{ nomesDasOpcoes(linha.item) }}</p>
+                  }
+                </div>
+                <p class="subtotal">{{ linha.subtotal | brl }}</p>
+              </li>
+            }
+          </ul>
+
+          <p class="bloco-total">
+            <span>Subtotal do combo</span>
+            <span>{{ grupo.subtotal | brl }}</span>
+          </p>
+        </section>
+      }
+
+      @if (avulsos().length > 0) {
+        <section class="bloco">
+          <ul>
+            @for (linha of avulsos(); track linha.posicao) {
+              <li class="linha">
+                <div class="descricao">
+                  <p class="nome">{{ linha.item.nome }}</p>
+                  @if (linha.item.opcoes.length > 0) {
+                    <p class="detalhe">{{ nomesDasOpcoes(linha.item) }}</p>
+                  }
+                  @if (linha.item.observacoes) {
+                    <p class="detalhe">Obs.: {{ linha.item.observacoes }}</p>
+                  }
+                  <p class="unitario">{{ linha.item.preco | brl }} cada</p>
+                </div>
+
+                <div class="controles">
+                  <div class="passos" role="group" [attr.aria-label]="'Quantidade de ' + linha.item.nome">
+                    <button type="button" (click)="mudarQuantidade(linha, -1)" aria-label="Diminuir">−</button>
+                    <output aria-live="polite">{{ linha.item.quantidade }}</output>
+                    <button
+                      type="button"
+                      (click)="mudarQuantidade(linha, 1)"
+                      [disabled]="linha.item.quantidade >= 20"
+                      aria-label="Aumentar"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p class="subtotal">{{ linha.subtotal | brl }}</p>
+                  <button type="button" class="remover" (click)="remover(linha)">Remover</button>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <button type="button" class="remover esvaziar" (click)="esvaziar()">Esvaziar carrinho</button>
+    </div>
+
+    <aside class="resumo" aria-label="Resumo do pedido">
+      <h2>Resumo</h2>
+      <dl>
+        <div>
+          <dt>Itens</dt>
+          <dd>{{ carrinho.quantidadeTotal() }}</dd>
+        </div>
+        <div class="final">
+          <dt>Total</dt>
+          <dd>{{ carrinho.valorTotal() | brl }}</dd>
+        </div>
+      </dl>
+
+      <button mat-flat-button class="finalizar" type="button" (click)="finalizar()">Finalizar pedido</button>
+      <a class="continuar" routerLink="/">Continuar escolhendo</a>
+    </aside>
+  </div>
+}

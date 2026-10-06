@@ -64,12 +64,69 @@ export interface Pagina<T> {
   ultima: boolean;
 }
 
+// ---------- Complementos ----------
+
+// Uma resposta possivel dentro de um grupo ("Gema mole", "Ovo extra").
+export interface Opcao {
+  id: number;
+  nome: string;
+  precoAdicional: number;
+}
+
+// Uma pergunta sobre o prato ("Ponto do ovo"), com as respostas possiveis.
+export interface GrupoOpcao {
+  id: number;
+  nome: string;
+  obrigatorio: boolean;
+  minEscolhas: number;
+  maxEscolhas: number;
+  opcoes: Opcao[];
+}
+
+// Prato na tela de detalhe: os dados do cardapio mais os complementos.
+export interface PratoDetalhe extends PratoCardapio {
+  gruposOpcoes: GrupoOpcao[];
+}
+
+// O que o cliente marcou: para cada id de grupo, os ids das opcoes escolhidas.
+export type Selecao = Record<number, number[]>;
+
+// ---------- Combos ----------
+
+export interface ComboEtapa {
+  id: number;
+  nome: string;
+  obrigatoria: boolean;
+  pratos: PratoCardapio[];
+}
+
+export interface Combo {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  tipo: 'PRONTO' | 'MONTAVEL';
+  descontoPercentual: number;
+  fotoUrl: string | null;
+  // So vem preenchidos nos combos prontos.
+  precoCheio: number | null;
+  precoComDesconto: number | null;
+  etapas: ComboEtapa[];
+}
+
 // ---------- Carrinho ----------
 
+// Uma linha do carrinho. "preco" e o valor final de UMA unidade:
+// preco do prato (ja com o desconto do combo, se houver) + complementos.
 export interface ItemCarrinho {
   pratoId: number;
   nome: string;
   preco: number;
   quantidade: number;
   observacoes: string;
+  opcoes: Opcao[];
+  // Preenchidos quando a linha faz parte de um combo.
+  comboId: number | null;
+  comboNome: string | null;
+  // Identifica cada combo adicionado, para agrupar as linhas dele no carrinho.
+  comboChave: string | null;
 }

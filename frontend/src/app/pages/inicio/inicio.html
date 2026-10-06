@@ -19,6 +19,38 @@
   }
 </nav>
 
+@if (categoriaId() === null && combos().length > 0) {
+  <section class="secao">
+    <h2>
+      <span class="kanji" aria-hidden="true">組</span>
+      Combos
+    </h2>
+
+    <ul class="combos">
+      @for (combo of combos(); track combo.id) {
+        <li>
+          <a class="combo" [class.montavel]="combo.tipo === 'MONTAVEL'" [routerLink]="['/combo', combo.id]">
+            <p class="selo">{{ combo.descontoPercentual }}% de desconto</p>
+            <h3>{{ combo.nome }}</h3>
+            <p class="descricao">{{ combo.descricao }}</p>
+
+            @if (combo.tipo === 'PRONTO') {
+              <p class="itens">{{ pratosDoCombo(combo) }}</p>
+              <p class="valores">
+                <s>{{ combo.precoCheio | brl }}</s>
+                <span class="preco">{{ combo.precoComDesconto | brl }}</span>
+              </p>
+            } @else {
+              <p class="itens">Você escolhe o prato, a bebida e o que mais quiser.</p>
+              <p class="valores"><span class="preco">Montar o meu</span></p>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+}
+
 @for (secao of secoes(); track secao.nome) {
   <section class="secao">
     <h2>

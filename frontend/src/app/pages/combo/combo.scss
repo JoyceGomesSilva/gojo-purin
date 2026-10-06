@@ -1,0 +1,262 @@
+.voltar {
+  display: inline-block;
+  margin: 16px 0 28px;
+  font-weight: 700;
+}
+
+.cabecalho {
+  max-width: 44rem;
+  margin-bottom: 48px;
+
+  h1 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    line-height: 1.15;
+    margin: 0 0 16px;
+    color: var(--gp-tinta);
+    text-wrap: balance;
+  }
+
+  .descricao {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--gp-tinta-suave);
+  }
+}
+
+.selo {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: var(--gp-rosa);
+  color: var(--gp-tinta);
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  gap: 56px;
+  align-items: start;
+}
+
+// Cada etapa e um cartao separado, com um pastel diferente na faixa do titulo.
+.etapa {
+  --cor: var(--gp-azul);
+  margin-bottom: 40px;
+  padding: 28px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  &:nth-of-type(4n + 2) {
+    --cor: var(--gp-rosa);
+  }
+
+  &:nth-of-type(4n + 3) {
+    --cor: var(--gp-amarelo);
+  }
+
+  &:nth-of-type(4n + 4) {
+    --cor: var(--gp-menta);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin: 0 0 20px;
+    padding: 12px 20px;
+    border-radius: 16px;
+    background: var(--cor);
+    color: var(--gp-tinta);
+  }
+}
+
+.regra {
+  font-family: var(--gp-fonte-texto);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--gp-papel);
+  color: var(--gp-tinta-suave);
+
+  &.obrigatoria {
+    color: var(--gp-rosa-forte);
+  }
+}
+
+.lista,
+.fixo {
+  margin: 0;
+}
+
+.fixo,
+.escolha {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 8px;
+}
+
+.escolha {
+  cursor: pointer;
+
+  & + .escolha {
+    border-top: 1px solid var(--gp-linha);
+  }
+
+  input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--gp-primaria);
+    cursor: inherit;
+  }
+}
+
+.nome {
+  flex: 1;
+  font-weight: 700;
+}
+
+.precos {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  white-space: nowrap;
+
+  s {
+    font-size: 0.85rem;
+    color: var(--gp-tinta-suave);
+  }
+
+  strong {
+    color: var(--gp-tinta);
+  }
+}
+
+// Os complementos do prato escolhido aparecem abaixo, separados por uma linha.
+.complementos {
+  margin-top: 24px;
+  padding-top: 28px;
+  border-top: 2px dashed var(--gp-linha);
+}
+
+// O resumo acompanha a rolagem no computador.
+.resumo {
+  position: sticky;
+  top: 112px;
+  padding: 32px 28px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+  box-shadow: 8px 8px 0 var(--gp-amarelo);
+
+  h2 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin: 0 0 20px;
+    color: var(--gp-tinta);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gp-linha);
+  }
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 700;
+}
+
+.detalhes {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  color: var(--gp-tinta-suave);
+}
+
+.vazio {
+  margin: 0 0 24px;
+  color: var(--gp-tinta-suave);
+}
+
+.totais {
+  margin: 20px 0 24px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .final {
+    margin-top: 8px;
+    font-family: var(--gp-fonte-titulo);
+    font-size: 1.3rem;
+  }
+}
+
+.falta {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--gp-rosa);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.adicionar {
+  width: 100%;
+  height: 56px;
+  font-size: 1rem;
+}
+
+.estado {
+  margin: 64px 0;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 860px) {
+  .colunas {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .resumo {
+    position: static;
+  }
+
+  .etapa {
+    padding: 20px;
+  }
+}

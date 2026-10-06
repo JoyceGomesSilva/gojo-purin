@@ -1,9 +1,12 @@
 package br.com.gojopurin.backend.controller;
 
 import br.com.gojopurin.backend.dto.CategoriaResponse;
+import br.com.gojopurin.backend.dto.ComboResponse;
 import br.com.gojopurin.backend.dto.PaginaResponse;
 import br.com.gojopurin.backend.dto.PratoCardapioResponse;
+import br.com.gojopurin.backend.dto.PratoDetalheResponse;
 import br.com.gojopurin.backend.service.CardapioService;
+import br.com.gojopurin.backend.service.ComboService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +25,11 @@ public class CardapioController {
     private static final int TAMANHO_MAXIMO = 50;
 
     private final CardapioService cardapioService;
+    private final ComboService comboService;
 
-    public CardapioController(CardapioService cardapioService) {
+    public CardapioController(CardapioService cardapioService, ComboService comboService) {
         this.cardapioService = cardapioService;
+        this.comboService = comboService;
     }
 
     // GET /api/cardapio?categoriaId=3&page=0&size=12
@@ -44,8 +49,19 @@ public class CardapioController {
         return cardapioService.listarCategorias();
     }
 
+    @GetMapping("/combos")
+    public List<ComboResponse> combos() {
+        return comboService.listar();
+    }
+
+    @GetMapping("/combos/{id}")
+    public ComboResponse combo(@PathVariable Long id) {
+        return comboService.detalhar(id);
+    }
+
+    // Detalhe do prato, com os complementos.
     @GetMapping("/{id}")
-    public PratoCardapioResponse detalhar(@PathVariable Long id) {
+    public PratoDetalheResponse detalhar(@PathVariable Long id) {
         return cardapioService.detalhar(id);
     }
 }

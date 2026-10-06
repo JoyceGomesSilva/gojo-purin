@@ -3,11 +3,13 @@
     <a class="marca" routerLink="/">Gojo Purin</a>
 
     <nav class="acoes" aria-label="Conta">
-      @if (carrinho.quantidadeTotal() > 0) {
-        <span class="carrinho" aria-live="polite">
+      <a class="carrinho" routerLink="/carrinho">
+        @if (carrinho.quantidadeTotal() > 0) {
           Carrinho: {{ carrinho.quantidadeTotal() }}
-        </span>
-      }
+        } @else {
+          Carrinho
+        }
+      </a>
 
       @if (auth.sessao(); as sessao) {
         <span class="saudacao">Olá, {{ sessao.nome }}</span>

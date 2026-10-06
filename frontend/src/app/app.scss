@@ -1,16 +1,13 @@
-// A faixa do topo e a "calda": caramelo escuro sobre o fundo cor de pudim.
+// A faixa do topo: azul pastel, com a borda de baixo escorrida como calda.
 .topo {
   position: sticky;
   top: 0;
   z-index: 10;
-  color: var(--gp-creme);
+  color: var(--gp-tinta);
 
-  // Dentro da faixa escura os botoes de texto do Material ficam claros.
-  --mat-button-text-label-text-color: var(--gp-creme);
-  --mat-button-text-state-layer-color: var(--gp-creme);
-
+  // Na faixa, os botoes de texto do Material usam a cor do texto.
   .mat-mdc-button:not(:disabled) {
-    color: var(--gp-creme);
+    color: var(--gp-tinta);
   }
 }
 
@@ -18,16 +15,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 20px;
-  background: var(--gp-caramelo);
+  gap: 16px;
+  padding: 16px 32px;
+  background: var(--gp-azul);
 }
 
 .marca {
   font-family: var(--gp-fonte-titulo);
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   line-height: 1;
-  color: var(--gp-custard);
+  color: var(--gp-tinta);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -35,39 +32,39 @@
 .acoes {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
 }
 
 .saudacao {
-  font-size: 0.9rem;
-  margin-right: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .carrinho {
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 6px 12px;
-  margin-right: 4px;
+  padding: 8px 16px;
   border-radius: 999px;
-  background: var(--gp-custard);
-  color: var(--gp-tinta);
+  background: var(--gp-papel);
+  color: var(--gp-rosa-forte);
+  text-decoration: none;
   white-space: nowrap;
 }
 
 .calda {
   display: block;
   width: 100%;
-  height: 22px;
+  height: 24px;
   margin-top: -1px;
-  fill: var(--gp-caramelo);
-  // A calda nao pode bloquear cliques no que esta por baixo.
+  fill: var(--gp-azul);
+  // A borda nao pode bloquear cliques no que esta por baixo.
   pointer-events: none;
 }
 
 .conteudo {
-  max-width: 1120px;
+  max-width: 1160px;
   margin: 0 auto;
-  padding: 16px 20px 64px;
+  padding: 24px 32px 96px;
 }
 
 @media (max-width: 640px) {
@@ -78,10 +75,14 @@
   }
 
   .topo-linha {
-    padding: 8px 12px;
+    padding: 12px 16px;
   }
 
   .marca {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
+  }
+
+  .conteudo {
+    padding: 16px 16px 72px;
   }
 }
