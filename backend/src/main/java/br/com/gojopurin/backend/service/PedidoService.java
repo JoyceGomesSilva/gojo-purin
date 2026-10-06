@@ -9,10 +9,7 @@ import br.com.gojopurin.backend.dto.PedidoStatusResponse;
 import br.com.gojopurin.backend.exception.ApiException;
 import br.com.gojopurin.backend.model.Combo;
 import br.com.gojopurin.backend.model.ComboEtapa;
-import br.com.gojopurin.backend.model.FichaTecnica;
-import br.com.gojopurin.backend.model.FichaTecnicaItem;
 import br.com.gojopurin.backend.model.GrupoOpcao;
-import br.com.gojopurin.backend.model.Ingrediente;
 import br.com.gojopurin.backend.model.Opcao;
 import br.com.gojopurin.backend.model.Pedido;
 import br.com.gojopurin.backend.model.PedidoItem;
@@ -20,9 +17,6 @@ import br.com.gojopurin.backend.model.PedidoItemOpcao;
 import br.com.gojopurin.backend.model.Prato;
 import br.com.gojopurin.backend.model.Usuario;
 import br.com.gojopurin.backend.repository.ComboRepository;
-import br.com.gojopurin.backend.repository.EstoqueMovimentacaoRepository;
-import br.com.gojopurin.backend.repository.FichaTecnicaRepository;
-import br.com.gojopurin.backend.repository.IngredienteRepository;
 import br.com.gojopurin.backend.repository.PedidoRepository;
 import br.com.gojopurin.backend.repository.PratoGrupoOpcaoRepository;
 import br.com.gojopurin.backend.repository.PratoRepository;
@@ -33,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,26 +46,20 @@ public class PedidoService {
     private final PratoRepository pratoRepository;
     private final PratoGrupoOpcaoRepository pratoGrupoOpcaoRepository;
     private final ComboRepository comboRepository;
-    private final FichaTecnicaRepository fichaTecnicaRepository;
-    private final IngredienteRepository ingredienteRepository;
-    private final EstoqueMovimentacaoRepository estoqueRepository;
+    private final EstoqueService estoqueService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          UsuarioRepository usuarioRepository,
                          PratoRepository pratoRepository,
                          PratoGrupoOpcaoRepository pratoGrupoOpcaoRepository,
                          ComboRepository comboRepository,
-                         FichaTecnicaRepository fichaTecnicaRepository,
-                         IngredienteRepository ingredienteRepository,
-                         EstoqueMovimentacaoRepository estoqueRepository) {
+                         EstoqueService estoqueService) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.pratoRepository = pratoRepository;
         this.pratoGrupoOpcaoRepository = pratoGrupoOpcaoRepository;
         this.comboRepository = comboRepository;
-        this.fichaTecnicaRepository = fichaTecnicaRepository;
-        this.ingredienteRepository = ingredienteRepository;
-        this.estoqueRepository = estoqueRepository;
+        this.estoqueService = estoqueService;
     }
 
     // ------------------------------------------------------------------
@@ -83,7 +70,7 @@ public class PedidoService {
     // 1. confere se cada prato ainda esta no cardapio;
     // 2. confere os complementos e os combos;
     // 3. calcula todos os precos a partir do banco;
-    // 4. confere se ha estoque (RN03);
+    // 4. confere se ha estoque (RN03), pelo EstoqueService;
     // 5. grava o pedido como RECEBIDO.
     // @Transactional: se qualquer passo falhar, nada e gravado.
     @Transactional
@@ -97,8 +84,6 @@ public class PedidoService {
         pedido.setObservacoes(textoOuNulo(request.observacoes()));
         pedido.setPago(true); // pagamento simulado (RF-006)
 
-        // Quanto de cada ingrediente este pedido vai gastar (id -> quantidade).
-        Map<Long, BigDecimal> necessidade = new LinkedHashMap<>();
         BigDecimal total = BigDecimal.ZERO;
 
         for (PedidoItemRequest itemRequest : request.itens()) {
@@ -134,20 +119,15 @@ public class PedidoService {
                 escolhida.setNome(opcao.getNome());
                 escolhida.setPrecoAdicional(opcao.getPrecoAdicional());
                 item.adicionarOpcao(escolhida);
-
-                // Adicional que gasta estoque (ex.: "Ovo extra" = 1 ovo por unidade).
-                if (opcao.getIngredienteId() != null && opcao.getQuantidadeIngrediente() != null) {
-                    somar(necessidade, opcao.getIngredienteId(),
-                            opcao.getQuantidadeIngrediente().multiply(BigDecimal.valueOf(itemRequest.quantidade())));
-                }
             }
 
             pedido.adicionarItem(item);
             total = total.add(item.getSubtotal());
         }
 
-        somarIngredientesDasFichas(pedido, necessidade);
-        conferirEstoque(necessidade);
+        // RN03: recusa o pedido se faltar estoque. A baixa de verdade so
+        // acontece quando a cozinha confirma (AdminPedidoService).
+        estoqueService.conferir(estoqueService.calcularNecessidade(pedido));
 
         pedido.setValorTotal(total);
         pedido.registrarStatus("RECEBIDO", cliente.getId());
@@ -245,70 +225,6 @@ public class PedidoService {
                 "Um combo do carrinho está incompleto. Remova-o, monte de novo e tente outra vez.");
     }
 
-    // Soma o que cada prato gasta segundo a ficha tecnica:
-    // quantidade x fator de correcao x quantidade pedida / rendimento.
-    private void somarIngredientesDasFichas(Pedido pedido, Map<Long, BigDecimal> necessidade) {
-        Set<Long> pratoIds = new HashSet<>();
-        for (PedidoItem item : pedido.getItens()) {
-            pratoIds.add(item.getPrato().getId());
-        }
-
-        Map<Long, FichaTecnica> fichaPorPrato = new HashMap<>();
-        for (FichaTecnica ficha : fichaTecnicaRepository.buscarPorPratos(pratoIds)) {
-            fichaPorPrato.put(ficha.getPrato().getId(), ficha);
-        }
-
-        for (PedidoItem item : pedido.getItens()) {
-            FichaTecnica ficha = fichaPorPrato.get(item.getPrato().getId());
-            if (ficha == null) {
-                continue; // prato sem ficha nao gasta estoque
-            }
-            BigDecimal porcoes = BigDecimal.valueOf(item.getQuantidade());
-            BigDecimal rendimento = BigDecimal.valueOf(ficha.getRendimento());
-            for (FichaTecnicaItem linha : ficha.getItens()) {
-                BigDecimal gasto = linha.getQuantidade()
-                        .multiply(linha.getFatorCorrecao())
-                        .multiply(porcoes)
-                        .divide(rendimento, 3, RoundingMode.HALF_UP);
-                somar(necessidade, linha.getIngrediente().getId(), gasto);
-            }
-        }
-    }
-
-    // RN03: se faltar estoque de algum ingrediente, recusa o pedido com 422
-    // e diz o que falta.
-    private void conferirEstoque(Map<Long, BigDecimal> necessidade) {
-        if (necessidade.isEmpty()) {
-            return;
-        }
-
-        Map<Long, BigDecimal> saldos = new HashMap<>();
-        for (Object[] linha : estoqueRepository.somarSaldos(necessidade.keySet())) {
-            saldos.put(((Number) linha[0]).longValue(), new BigDecimal(linha[1].toString()));
-        }
-
-        Map<Long, Ingrediente> ingredientes = new HashMap<>();
-        for (Ingrediente ingrediente : ingredienteRepository.findAllById(necessidade.keySet())) {
-            ingredientes.put(ingrediente.getId(), ingrediente);
-        }
-
-        List<String> faltas = new ArrayList<>();
-        for (Map.Entry<Long, BigDecimal> entrada : necessidade.entrySet()) {
-            BigDecimal saldo = saldos.getOrDefault(entrada.getKey(), BigDecimal.ZERO);
-            if (saldo.compareTo(entrada.getValue()) < 0) {
-                Ingrediente ingrediente = ingredientes.get(entrada.getKey());
-                String nome = (ingrediente == null) ? "Ingrediente " + entrada.getKey() : ingrediente.getNome();
-                String unidade = (ingrediente == null) ? "" : " " + ingrediente.getUnidadePadrao().toLowerCase();
-                faltas.add(nome + ": o pedido precisa de " + numero(entrada.getValue()) + unidade
-                        + " e há " + numero(saldo.max(BigDecimal.ZERO)) + unidade);
-            }
-        }
-
-        if (!faltas.isEmpty()) {
-            throw new ApiException(INVALIDO, "Não temos estoque para este pedido agora.", faltas);
-        }
-    }
-
     // ------------------------------------------------------------------
     // Consultas do cliente
     // ------------------------------------------------------------------
@@ -354,20 +270,11 @@ public class PedidoService {
                 .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Sessão inválida. Entre de novo."));
     }
 
-    private static void somar(Map<Long, BigDecimal> mapa, Long chave, BigDecimal valor) {
-        mapa.merge(chave, valor, BigDecimal::add);
-    }
-
     private static boolean temTexto(String texto) {
         return texto != null && !texto.isBlank();
     }
 
     private static String textoOuNulo(String texto) {
         return temTexto(texto) ? texto.trim() : null;
-    }
-
-    // 80.000 vira "80"; 12.500 vira "12.5".
-    private static String numero(BigDecimal valor) {
-        return valor.stripTrailingZeros().toPlainString();
     }
 }

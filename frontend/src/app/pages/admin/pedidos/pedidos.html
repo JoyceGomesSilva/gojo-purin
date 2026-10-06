@@ -1,0 +1,102 @@
+<h1>Pedidos</h1>
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Status</span>
+    <select [value]="filtros().status" (change)="filtrar('status', $event)">
+      <option value="">Todos</option>
+      @for (status of opcoesDeStatus; track status) {
+        <option [value]="status">{{ nomeDoStatus(status) }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Canal</span>
+    <select [value]="filtros().canal" (change)="filtrar('canal', $event)">
+      <option value="">Todos</option>
+      <option value="SITE">Site</option>
+    </select>
+  </label>
+
+  <label>
+    <span>De</span>
+    <input type="date" [value]="filtros().de" (change)="filtrar('de', $event)" />
+  </label>
+
+  <label>
+    <span>Até</span>
+    <input type="date" [value]="filtros().ate" (change)="filtrar('ate', $event)" />
+  </label>
+
+  <button mat-button type="button" (click)="limparFiltros()">Limpar filtros</button>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando os pedidos...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar os pedidos. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (pedidos().length === 0) {
+  <p class="estado">Nenhum pedido com estes filtros.</p>
+} @else {
+  <p class="contagem">{{ totalPedidos() }} {{ totalPedidos() === 1 ? 'pedido' : 'pedidos' }}</p>
+
+  <ul class="pedidos">
+    @for (pedido of pedidos(); track pedido.id) {
+      <li class="pedido">
+        <header class="topo">
+          <div>
+            <h2>Pedido nº {{ pedido.id }}</h2>
+            <p class="quando">{{ pedido.criadoEm | dataHora }}, {{ pedido.clienteNome }}</p>
+          </div>
+          <span [class]="'status ' + pedido.status.toLowerCase()">{{ nomeDoStatus(pedido.status) }}</span>
+        </header>
+
+        <ul class="itens">
+          @for (item of pedido.itens; track item.id) {
+            <li>
+              <p class="item">{{ item.quantidade }} × {{ item.pratoNome }}</p>
+              @if (item.opcoes.length > 0) {
+                <p class="detalhe">{{ item.opcoes.join(', ') }}</p>
+              }
+              @if (item.observacoes) {
+                <p class="detalhe obs">Obs.: {{ item.observacoes }}</p>
+              }
+            </li>
+          }
+        </ul>
+
+        @if (pedido.status === 'CANCELADO' && pedido.motivoCancelamento) {
+          <p class="motivo">Motivo do cancelamento: {{ pedido.motivoCancelamento }}</p>
+        }
+
+        <footer class="rodape">
+          <p class="total">{{ pedido.valorTotal | brl }}</p>
+          <a [routerLink]="['/admin/pedidos', pedido.id]">Ver detalhes</a>
+        </footer>
+
+        <app-acoes-pedido [pedido]="pedido" (atualizado)="trocar($event)" />
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

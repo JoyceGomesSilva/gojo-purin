@@ -4,10 +4,13 @@ import br.com.gojopurin.backend.model.Pedido;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+// JpaSpecificationExecutor permite montar filtros opcionais (status, canal,
+// datas) em tempo de execucao, usados na lista de pedidos do painel.
+public interface PedidoRepository extends JpaRepository<Pedido, Long>, JpaSpecificationExecutor<Pedido> {
 
     // Historico do cliente, do mais recente para o mais antigo (RF-008).
     Page<Pedido> findByClienteIdOrderByCreatedAtDesc(Long clienteId, Pageable pageable);

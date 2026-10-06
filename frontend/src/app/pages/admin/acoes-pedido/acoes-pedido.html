@@ -1,0 +1,30 @@
+@if (cancelando()) {
+  <div class="cancelamento">
+    <mat-form-field appearance="outline">
+      <mat-label>Motivo do cancelamento</mat-label>
+      <input matInput [formControl]="motivo" maxlength="255" placeholder="Ex.: cliente desistiu" />
+      @if (motivo.hasError('required')) {
+        <mat-error>Informe o motivo</mat-error>
+      }
+    </mat-form-field>
+    <div class="botoes">
+      <button mat-flat-button type="button" class="perigo" [disabled]="enviando()" (click)="confirmarCancelamento()">
+        Confirmar cancelamento
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharCancelamento()">Voltar</button>
+    </div>
+  </div>
+} @else {
+  <div class="botoes">
+    @if (destino()) {
+      <button mat-flat-button type="button" [disabled]="enviando()" (click)="avancar()">
+        {{ textoDoBotao() }}
+      </button>
+    }
+    @if (cancelavel()) {
+      <button mat-button type="button" class="cancelar" [disabled]="enviando()" (click)="abrirCancelamento()">
+        Cancelar pedido
+      </button>
+    }
+  </div>
+}

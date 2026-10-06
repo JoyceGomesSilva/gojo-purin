@@ -1,0 +1,210 @@
+h1 {
+  font-family: var(--gp-fonte-titulo);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  line-height: 1.15;
+  margin: 0 0 28px;
+}
+
+// Barra de filtros.
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 36px;
+  padding: 24px 28px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  select,
+  input {
+    min-width: 170px;
+    height: 44px;
+    padding: 0 14px;
+    border: 2px solid var(--gp-linha);
+    border-radius: 12px;
+    background: var(--gp-papel);
+    color: var(--gp-tinta);
+    font: inherit;
+    font-weight: 500;
+  }
+}
+
+.contagem {
+  margin: 0 0 20px;
+  font-weight: 700;
+  color: var(--gp-tinta-suave);
+}
+
+.pedidos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 32px;
+  align-items: start;
+}
+
+.pedido {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+}
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  h2 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: 1.25rem;
+    margin: 0 0 4px;
+  }
+}
+
+.quando {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--gp-tinta-suave);
+}
+
+// A etiqueta muda de cor conforme o andamento.
+.status {
+  flex: none;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--gp-azul);
+  white-space: nowrap;
+
+  &.recebido {
+    background: var(--gp-amarelo);
+  }
+
+  &.finalizado {
+    background: var(--gp-menta);
+  }
+
+  &.cancelado {
+    background: var(--gp-rosa);
+  }
+}
+
+.itens {
+  list-style: none;
+  margin: 0;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--gp-fundo);
+
+  li + li {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gp-linha);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.item {
+  font-weight: 700;
+}
+
+.detalhe {
+  margin-top: 4px !important;
+  font-size: 0.9rem;
+  color: var(--gp-tinta-suave);
+
+  // A observacao do cliente precisa saltar aos olhos de quem cozinha.
+  &.obs {
+    color: var(--gp-rosa-forte);
+    font-weight: 700;
+  }
+}
+
+.motivo {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gp-rosa-forte);
+}
+
+.rodape {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+
+  a {
+    font-weight: 700;
+  }
+}
+
+.total {
+  margin: 0;
+  font-family: var(--gp-fonte-titulo);
+  font-size: 1.2rem;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 48px;
+  font-weight: 700;
+}
+
+.estado {
+  margin: 48px 0;
+  font-size: 1.05rem;
+
+  p {
+    margin: 0 0 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pedidos {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros {
+    padding: 20px;
+
+    label {
+      flex: 1 1 140px;
+    }
+
+    select,
+    input {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+
+  .pedido {
+    padding: 20px;
+  }
+}

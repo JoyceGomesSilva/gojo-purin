@@ -1,0 +1,49 @@
+.painel-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin: 24px 0 20px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.titulo {
+  font-family: var(--gp-fonte-titulo);
+  font-size: 1.6rem;
+}
+
+.perfil {
+  font-weight: 700;
+  color: var(--gp-tinta-suave);
+}
+
+// Menu em abas. Rola para o lado se nao couber.
+.menu {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin-bottom: 40px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--gp-linha);
+
+  a {
+    flex: none;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    color: var(--gp-tinta);
+    text-decoration: none;
+    background: var(--gp-papel);
+    border: 2px solid var(--gp-linha);
+
+    &.ativo {
+      background: var(--gp-tinta);
+      border-color: var(--gp-tinta);
+      color: #ffffff;
+    }
+  }
+}

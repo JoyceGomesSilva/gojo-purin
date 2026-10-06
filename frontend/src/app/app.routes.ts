@@ -46,9 +46,22 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/cadastro/cadastro').then((m) => m.Cadastro)
   },
   {
+    // Painel: a moldura (AdminLayout) fica fixa e as telas filhas trocam dentro dela.
     path: 'admin',
     canActivate: [authGuard, roleGuard('ADMIN', 'GERENTE', 'COZINHEIRO')],
-    loadComponent: () => import('./pages/admin/admin-inicio').then((m) => m.AdminInicio)
+    loadComponent: () => import('./pages/admin/admin-layout').then((m) => m.AdminLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'pedidos' },
+      {
+        path: 'pedidos',
+        loadComponent: () => import('./pages/admin/pedidos/pedidos').then((m) => m.AdminPedidos)
+      },
+      {
+        path: 'pedidos/:id',
+        loadComponent: () =>
+          import('./pages/admin/pedido-detalhe/pedido-detalhe').then((m) => m.AdminPedidoDetalhe)
+      }
+    ]
   },
   // Qualquer endereco desconhecido volta para o inicio.
   { path: '**', redirectTo: '' }

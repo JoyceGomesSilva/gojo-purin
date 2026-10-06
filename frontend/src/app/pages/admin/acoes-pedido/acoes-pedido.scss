@@ -1,0 +1,26 @@
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cancelamento {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--gp-rosa);
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+// Os botoes de cancelar usam a cor de alerta no lugar do azul.
+.cancelar.mat-mdc-button:not(:disabled) {
+  color: var(--gp-rosa-forte);
+}
+
+.perigo.mat-mdc-unelevated-button:not(:disabled) {
+  background: var(--gp-rosa-forte);
+  color: #ffffff;
+}

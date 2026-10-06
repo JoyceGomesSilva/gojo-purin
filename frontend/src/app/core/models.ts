@@ -199,3 +199,21 @@ export interface PedidoStatus {
   atualizadoEm: string;
   historico: StatusHistorico[];
 }
+
+// ---------- Painel: pedidos ----------
+
+// Pedido como a equipe ve: os dados do pedido mais os do cliente e o canal.
+export interface AdminPedido extends Pedido {
+  canal: string;
+  clienteNome: string;
+  clienteTelefone: string | null;
+  clienteEmail: string;
+}
+
+// Filtros da lista de pedidos do painel. Texto vazio = sem filtro.
+export interface FiltrosDePedido {
+  status: string;
+  canal: string;
+  de: string;
+  ate: string;
+}

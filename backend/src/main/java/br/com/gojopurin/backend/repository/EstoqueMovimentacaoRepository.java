@@ -20,4 +20,7 @@ public interface EstoqueMovimentacaoRepository extends JpaRepository<EstoqueMovi
             group by m.ingredienteId
             """)
     List<Object[]> somarSaldos(@Param("ingredienteIds") Collection<Long> ingredienteIds);
+
+    // As movimentacoes de um tipo geradas por um pedido (ex.: as SAIDAS da baixa).
+    List<EstoqueMovimentacao> findByPedidoIdAndTipo(Long pedidoId, String tipo);
 }
