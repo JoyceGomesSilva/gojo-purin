@@ -1,0 +1,241 @@
+.cabecalho {
+  margin: 32px 0 32px;
+
+  h1 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    line-height: 1.15;
+    margin: 0 0 8px;
+  }
+}
+
+.selo {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: var(--gp-menta);
+}
+
+.quando {
+  margin: 0;
+  color: var(--gp-tinta-suave);
+}
+
+// Caixa com o status atual, em destaque.
+.situacao {
+  margin-bottom: 40px;
+  padding: 28px 32px;
+  border-radius: 24px;
+  background: var(--gp-azul);
+
+  h2 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: 1.6rem;
+    margin: 0 0 8px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  p + p {
+    margin-top: 8px;
+  }
+
+  &.cancelado {
+    background: var(--gp-rosa);
+  }
+}
+
+// Linha do tempo: cinco passos lado a lado, ligados por uma linha.
+.linha-do-tempo {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  list-style: none;
+  margin: 0 0 56px;
+  padding: 0;
+
+  li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    color: var(--gp-tinta-suave);
+
+    // O traco que liga cada passo ao anterior.
+    &::before {
+      content: '';
+      position: absolute;
+      top: 13px;
+      right: 50%;
+      width: 100%;
+      height: 4px;
+      background: var(--gp-linha);
+    }
+
+    &:first-child::before {
+      display: none;
+    }
+  }
+
+  .marca {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 4px solid var(--gp-linha);
+    background: var(--gp-papel);
+  }
+
+  .nome {
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .hora {
+    font-size: 0.85rem;
+  }
+
+  // Passos ja concluidos e o passo atual ficam coloridos.
+  .feito,
+  .atual {
+    color: var(--gp-tinta);
+
+    &::before {
+      background: var(--gp-primaria);
+    }
+
+    .marca {
+      border-color: var(--gp-primaria);
+      background: var(--gp-primaria);
+    }
+  }
+
+  .atual .marca {
+    background: var(--gp-papel);
+    box-shadow: 0 0 0 6px var(--gp-azul);
+  }
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.bloco {
+  padding: 28px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  h2 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin: 0 0 16px;
+
+    &.segundo {
+      margin-top: 32px;
+    }
+  }
+}
+
+.itens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gp-linha);
+  }
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 700;
+}
+
+.detalhe {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  color: var(--gp-tinta-suave);
+}
+
+.texto {
+  margin: 0;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0 0;
+  font-family: var(--gp-fonte-titulo);
+  font-size: 1.3rem;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 48px 0 0;
+}
+
+.estado {
+  margin: 64px 0;
+  text-align: center;
+  font-size: 1.05rem;
+
+  p {
+    margin: 0 0 20px;
+  }
+}
+
+// No celular a linha do tempo fica em pe, um passo embaixo do outro.
+@media (max-width: 700px) {
+  .linha-do-tempo {
+    grid-template-columns: 1fr;
+    gap: 24px;
+
+    li {
+      flex-direction: row;
+      gap: 16px;
+      text-align: left;
+
+      &::before {
+        top: auto;
+        bottom: 100%;
+        right: auto;
+        left: 13px;
+        width: 4px;
+        height: 24px;
+      }
+    }
+
+    .hora {
+      margin-left: auto;
+    }
+  }
+
+  .colunas {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .situacao,
+  .bloco {
+    padding: 20px;
+  }
+}

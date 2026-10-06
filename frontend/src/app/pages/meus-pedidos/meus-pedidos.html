@@ -1,0 +1,35 @@
+<h1>Meus pedidos</h1>
+
+<ul class="pedidos">
+  @for (pedido of pedidos(); track pedido.id) {
+    <li>
+      <a class="pedido" [routerLink]="['/pedido', pedido.id]">
+        <div class="topo">
+          <span class="numero">Pedido nº {{ pedido.id }}</span>
+          <span class="status" [class]="'status ' + pedido.status.toLowerCase()">{{ nomeDoStatus(pedido.status) }}</span>
+        </div>
+        <p class="quando">{{ pedido.criadoEm | dataHora }}</p>
+        <p class="itens">{{ resumoDosItens(pedido) }}</p>
+        <p class="total">{{ pedido.valorTotal | brl }}</p>
+      </a>
+    </li>
+  }
+</ul>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando seus pedidos...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar seus pedidos. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (pedidos().length === 0) {
+  <div class="estado">
+    <p>Você ainda não fez nenhum pedido.</p>
+    <a mat-flat-button routerLink="/">Ver o cardápio</a>
+  </div>
+} @else if (temMais()) {
+  <div class="estado">
+    <button mat-stroked-button type="button" (click)="verMais()">Ver pedidos mais antigos</button>
+  </div>
+}

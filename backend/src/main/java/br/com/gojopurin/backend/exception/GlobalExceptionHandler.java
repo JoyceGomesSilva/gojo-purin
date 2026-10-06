@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErroResponse> tratarApiException(ApiException ex) {
         ErroResponse corpo = new ErroResponse(
-                ex.getStatus().value(), ex.getMessage(), List.of(), LocalDateTime.now());
+                ex.getStatus().value(), ex.getMessage(), ex.getDetalhes(), LocalDateTime.now());
         return ResponseEntity.status(ex.getStatus()).body(corpo);
     }
 

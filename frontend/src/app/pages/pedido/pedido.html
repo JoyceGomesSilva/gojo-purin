@@ -1,0 +1,85 @@
+@if (carregando()) {
+  <p class="estado" role="status">Buscando seu pedido...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não encontramos este pedido na sua conta.</p>
+    <a mat-flat-button routerLink="/meus-pedidos">Ver meus pedidos</a>
+  </div>
+} @else {
+  @if (pedido(); as p) {
+    <header class="cabecalho">
+      @if (novo) {
+        <p class="selo">Pedido confirmado!</p>
+      }
+      <h1>Pedido nº {{ p.id }}</h1>
+      <p class="quando">Feito em {{ p.criadoEm | dataHora }}</p>
+    </header>
+
+    <section class="situacao" [class.cancelado]="cancelado()" aria-live="polite">
+      <h2>{{ nomeDoStatus(p.status) }}</h2>
+      <p>{{ explicacao() }}</p>
+      @if (cancelado() && p.motivoCancelamento) {
+        <p>Motivo: {{ p.motivoCancelamento }}</p>
+      }
+    </section>
+
+    @if (!cancelado()) {
+      <ol class="linha-do-tempo" aria-label="Andamento do pedido">
+        @for (passo of passos(); track passo.status) {
+          <li [class]="passo.situacao" [attr.aria-current]="passo.situacao === 'atual' ? 'step' : null">
+            <span class="marca" aria-hidden="true"></span>
+            <span class="nome">{{ passo.nome }}</span>
+            @if (passo.hora) {
+              <span class="hora">{{ passo.hora | dataHora: 'hora' }}</span>
+            }
+          </li>
+        }
+      </ol>
+    }
+
+    <div class="colunas">
+      <section class="bloco">
+        <h2>Itens</h2>
+        <ul class="itens">
+          @for (item of p.itens; track item.id) {
+            <li>
+              <div class="linha">
+                <span>{{ item.quantidade }} × {{ item.pratoNome }}</span>
+                <span>{{ item.subtotal | brl }}</span>
+              </div>
+              @if (item.comboNome) {
+                <p class="detalhe">Combo {{ item.comboNome }}</p>
+              }
+              @if (item.opcoes.length > 0) {
+                <p class="detalhe">{{ item.opcoes.join(', ') }}</p>
+              }
+              @if (item.observacoes) {
+                <p class="detalhe">Obs.: {{ item.observacoes }}</p>
+              }
+            </li>
+          }
+        </ul>
+        <p class="total">
+          <span>Total</span>
+          <span>{{ p.valorTotal | brl }}</span>
+        </p>
+      </section>
+
+      <section class="bloco">
+        <h2>Entrega</h2>
+        <p class="texto">{{ p.enderecoEntrega }}</p>
+        @if (p.observacoes) {
+          <p class="detalhe">Obs.: {{ p.observacoes }}</p>
+        }
+
+        <h2 class="segundo">Pagamento</h2>
+        <p class="texto">{{ p.pago ? 'Pago (simulado)' : 'Aguardando pagamento' }}</p>
+      </section>
+    </div>
+
+    <p class="acoes">
+      <a mat-stroked-button routerLink="/meus-pedidos">Ver meus pedidos</a>
+      <a mat-button routerLink="/">Voltar ao cardápio</a>
+    </p>
+  }
+}

@@ -28,6 +28,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/checkout/checkout').then((m) => m.Checkout)
   },
   {
+    path: 'pedido/:id',
+    canActivate: [authGuard, roleGuard('CLIENTE')],
+    loadComponent: () => import('./pages/pedido/pedido').then((m) => m.PedidoPagina)
+  },
+  {
+    path: 'meus-pedidos',
+    canActivate: [authGuard, roleGuard('CLIENTE')],
+    loadComponent: () => import('./pages/meus-pedidos/meus-pedidos').then((m) => m.MeusPedidos)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login)
   },

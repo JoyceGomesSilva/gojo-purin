@@ -1,0 +1,77 @@
+<a class="voltar" routerLink="/carrinho">Voltar ao carrinho</a>
+<h1>Finalizar pedido</h1>
+
+<div class="colunas">
+  <div class="dados">
+    <section class="bloco">
+      <h2>Entrega</h2>
+      <mat-form-field appearance="outline">
+        <mat-label>Endereço de entrega</mat-label>
+        <input matInput [formControl]="endereco" autocomplete="street-address" maxlength="255" />
+        <mat-hint>Rua, número, complemento e bairro</mat-hint>
+        @if (endereco.hasError('required')) {
+          <mat-error>Informe o endereço de entrega</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Observações para a entrega</mat-label>
+        <input matInput [formControl]="observacoes" placeholder="Ex.: interfone 42" maxlength="500" />
+      </mat-form-field>
+    </section>
+
+    <section class="bloco">
+      <h2>Pagamento</h2>
+      <p class="pagamento">
+        Pagamento simulado: ao confirmar, o pedido já é registrado como pago.
+        Nenhum dado de cartão é pedido.
+      </p>
+    </section>
+  </div>
+
+  <aside class="resumo" aria-label="Resumo do pedido">
+    <h2>Seu pedido</h2>
+
+    <ul>
+      @for (item of carrinho.itens(); track $index) {
+        <li>
+          <div class="linha">
+            <span>{{ item.quantidade }} × {{ item.nome }}</span>
+            <span>{{ subtotal(item) | brl }}</span>
+          </div>
+          @if (item.comboNome) {
+            <p class="detalhe">Combo {{ item.comboNome }}</p>
+          }
+          @if (item.opcoes.length > 0) {
+            <p class="detalhe">{{ nomesDasOpcoes(item) }}</p>
+          }
+          @if (item.observacoes) {
+            <p class="detalhe">Obs.: {{ item.observacoes }}</p>
+          }
+        </li>
+      }
+    </ul>
+
+    <p class="total">
+      <span>Total</span>
+      <span>{{ carrinho.valorTotal() | brl }}</span>
+    </p>
+
+    @if (erro()) {
+      <div class="erro" role="alert">
+        <p>{{ erro() }}</p>
+        @if (detalhesDoErro().length > 0) {
+          <ul>
+            @for (detalhe of detalhesDoErro(); track detalhe) {
+              <li>{{ detalhe }}</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <button mat-flat-button class="confirmar" type="button" [disabled]="enviando()" (click)="confirmar()">
+      {{ enviando() ? 'Enviando pedido...' : 'Confirmar pedido' }}
+    </button>
+  </aside>
+</div>

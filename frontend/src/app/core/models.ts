@@ -130,3 +130,72 @@ export interface ItemCarrinho {
   // Identifica cada combo adicionado, para agrupar as linhas dele no carrinho.
   comboChave: string | null;
 }
+
+// ---------- Pedidos ----------
+
+export type StatusPedido =
+  | 'RECEBIDO'
+  | 'CONFIRMADO'
+  | 'EM_PREPARO'
+  | 'PRONTO'
+  | 'SAIU_ENTREGA'
+  | 'FINALIZADO'
+  | 'CANCELADO';
+
+// O que o front envia no checkout. Nao vai preco: o back calcula tudo.
+export interface PedidoItemRequest {
+  pratoId: number;
+  quantidade: number;
+  observacoes: string;
+  opcaoIds: number[];
+  comboId: number | null;
+  comboChave: string | null;
+}
+
+export interface PedidoRequest {
+  enderecoEntrega: string;
+  observacoes: string;
+  itens: PedidoItemRequest[];
+}
+
+export interface PedidoItem {
+  id: number;
+  pratoId: number;
+  pratoNome: string;
+  quantidade: number;
+  precoUnitario: number;
+  subtotal: number;
+  observacoes: string | null;
+  comboNome: string | null;
+  comboChave: string | null;
+  opcoes: string[];
+}
+
+// Um ponto da linha do tempo.
+export interface StatusHistorico {
+  status: StatusPedido;
+  dataHora: string;
+}
+
+export interface Pedido {
+  id: number;
+  status: StatusPedido;
+  valorTotal: number;
+  enderecoEntrega: string;
+  observacoes: string | null;
+  motivoCancelamento: string | null;
+  pago: boolean;
+  criadoEm: string;
+  atualizadoEm: string;
+  itens: PedidoItem[];
+  historico: StatusHistorico[];
+}
+
+// Resposta leve de /api/pedidos/{id}/status.
+export interface PedidoStatus {
+  id: number;
+  status: StatusPedido;
+  motivoCancelamento: string | null;
+  atualizadoEm: string;
+  historico: StatusHistorico[];
+}

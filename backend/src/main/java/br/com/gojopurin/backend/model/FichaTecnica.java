@@ -1,0 +1,59 @@
+package br.com.gojopurin.backend.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+// A receita de um prato: quais ingredientes ele usa e em que quantidade.
+// Cada prato tem no maximo uma ficha (prato 1:1 ficha_tecnica).
+@Entity
+@Table(name = "ficha_tecnica")
+public class FichaTecnica {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "prato_id", nullable = false, unique = true)
+    private Prato prato;
+
+    // Quantas porcoes a receita rende.
+    @Column(nullable = false)
+    private Integer rendimento = 1;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "fichaTecnica")
+    private List<FichaTecnicaItem> itens = new ArrayList<>();
+
+    @PrePersist
+    void aoCriar() {
+        createdAt = LocalDateTime.now();
+    }
+
+    public Long getId() { return id; }
+
+    public Prato getPrato() { return prato; }
+    public void setPrato(Prato prato) { this.prato = prato; }
+
+    public Integer getRendimento() { return rendimento; }
+    public void setRendimento(Integer rendimento) { this.rendimento = rendimento; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public List<FichaTecnicaItem> getItens() { return itens; }
+}

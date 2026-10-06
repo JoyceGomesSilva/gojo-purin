@@ -67,7 +67,33 @@
   padding: 24px 32px 96px;
 }
 
+.so-estreito {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  // Textos mais curtos e botoes mais justos para o topo caber em uma linha.
+  .so-largo {
+    display: none;
+  }
+
+  .so-estreito {
+    display: inline;
+  }
+
+  .acoes {
+    gap: 2px;
+  }
+
+  .topo .mat-mdc-button {
+    min-width: 0;
+    padding: 0 8px;
+  }
+
+  .carrinho {
+    padding: 6px 12px;
+  }
+
   // No celular somem a saudacao e o "Criar conta" (a tela de login leva ao cadastro).
   .saudacao,
   .criar-conta {
