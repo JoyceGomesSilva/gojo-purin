@@ -1,12 +1,22 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
   templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('frontend');
+  private http = inject(HttpClient);
+  mensagem = signal('Conectando com a cozinha...');
+
+  constructor() {
+    this.http
+      .get(`${environment.apiUrl}/api/ping`, { responseType: 'text' })
+      .subscribe({
+        next: (texto) => this.mensagem.set(texto),
+        error: () => this.mensagem.set('Não consegui falar com o back-end.')
+      });
+  }
 }
