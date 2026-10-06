@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/inicio/inicio').then((m) => m.Inicio)
   },
   {
+    path: 'prato/:id',
+    loadComponent: () => import('./pages/prato/prato').then((m) => m.PratoDetalhe)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login)
   },

@@ -1,0 +1,70 @@
+<a class="voltar" routerLink="/">Voltar ao cardápio</a>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando o prato...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Este prato não está no cardápio agora.</p>
+    <a mat-flat-button routerLink="/">Ver o cardápio</a>
+  </div>
+} @else {
+  @if (prato(); as p) {
+    <article class="detalhe">
+      <div class="foto">
+        @if (p.fotoUrl) {
+          <img [src]="p.fotoUrl" [alt]="p.nome" />
+        } @else {
+          <span aria-hidden="true">{{ kanji() }}</span>
+        }
+      </div>
+
+      <div class="info">
+        <p class="categoria">{{ p.categoriaNome }}</p>
+        <h1>{{ p.nome }}</h1>
+
+        @if (p.anime && p.anime !== 'Original') {
+          <p class="origem">Visto em {{ p.anime }}</p>
+        } @else {
+          <p class="origem">Criação da casa</p>
+        }
+
+        <p class="descricao">{{ p.descricao }}</p>
+
+        <dl class="fatos">
+          <div>
+            <dt>Preço</dt>
+            <dd>{{ p.preco | brl }}</dd>
+          </div>
+          <div>
+            <dt>Tempo de preparo</dt>
+            <dd>{{ p.tempoPreparoMin }} min</dd>
+          </div>
+        </dl>
+
+        <div class="pedido">
+          <div class="quantidade">
+            <span id="rotulo-quantidade">Quantidade</span>
+            <div class="passos" role="group" aria-labelledby="rotulo-quantidade">
+              <button type="button" (click)="mudarQuantidade(-1)" [disabled]="quantidade() <= 1" aria-label="Diminuir">
+                −
+              </button>
+              <output aria-live="polite">{{ quantidade() }}</output>
+              <button type="button" (click)="mudarQuantidade(1)" [disabled]="quantidade() >= 20" aria-label="Aumentar">
+                +
+              </button>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Observações</mat-label>
+            <input matInput [formControl]="observacoes" placeholder="Ex.: sem cebola" maxlength="255" />
+          </mat-form-field>
+
+          <button mat-flat-button class="adicionar" type="button" (click)="adicionar()">
+            Adicionar ao carrinho ({{ subtotal() | brl }})
+          </button>
+        </div>
+      </div>
+    </article>
+  }
+}

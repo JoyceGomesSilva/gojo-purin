@@ -31,3 +31,45 @@ export interface ErroApi {
   detalhes: string[];
   dataHora: string;
 }
+
+// ---------- Cardapio ----------
+
+export interface Categoria {
+  id: number;
+  nome: string;
+  descricao: string | null;
+}
+
+// Prato como vem de /api/cardapio (PratoCardapioResponse no back).
+export interface PratoCardapio {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  fotoUrl: string | null;
+  preco: number;
+  tempoPreparoMin: number;
+  anime: string | null;
+  personagem: string | null;
+  categoriaId: number;
+  categoriaNome: string;
+}
+
+// Formato de todas as listagens paginadas do back (PaginaResponse).
+export interface Pagina<T> {
+  conteudo: T[];
+  pagina: number;
+  tamanho: number;
+  totalElementos: number;
+  totalPaginas: number;
+  ultima: boolean;
+}
+
+// ---------- Carrinho ----------
+
+export interface ItemCarrinho {
+  pratoId: number;
+  nome: string;
+  preco: number;
+  quantidade: number;
+  observacoes: string;
+}

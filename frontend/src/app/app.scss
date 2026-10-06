@@ -1,19 +1,41 @@
+// A faixa do topo e a "calda": caramelo escuro sobre o fundo cor de pudim.
 .topo {
   position: sticky;
   top: 0;
   z-index: 10;
-  gap: 8px;
+  color: var(--gp-creme);
+
+  // Dentro da faixa escura os botoes de texto do Material ficam claros.
+  --mat-button-text-label-text-color: var(--gp-creme);
+  --mat-button-text-state-layer-color: var(--gp-creme);
+
+  .mat-mdc-button:not(:disabled) {
+    color: var(--gp-creme);
+  }
+}
+
+.topo-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--gp-caramelo);
 }
 
 .marca {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: inherit;
+  font-family: var(--gp-fonte-titulo);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--gp-custard);
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.espaco {
-  flex: 1;
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .saudacao {
@@ -21,15 +43,45 @@
   margin-right: 4px;
 }
 
-.conteudo {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 24px 16px;
+.carrinho {
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  margin-right: 4px;
+  border-radius: 999px;
+  background: var(--gp-custard);
+  color: var(--gp-tinta);
+  white-space: nowrap;
 }
 
-// Em telas estreitas a saudacao some para os botoes caberem.
-@media (max-width: 600px) {
-  .saudacao {
+.calda {
+  display: block;
+  width: 100%;
+  height: 22px;
+  margin-top: -1px;
+  fill: var(--gp-caramelo);
+  // A calda nao pode bloquear cliques no que esta por baixo.
+  pointer-events: none;
+}
+
+.conteudo {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px 20px 64px;
+}
+
+@media (max-width: 640px) {
+  // No celular somem a saudacao e o "Criar conta" (a tela de login leva ao cadastro).
+  .saudacao,
+  .criar-conta {
     display: none;
+  }
+
+  .topo-linha {
+    padding: 8px 12px;
+  }
+
+  .marca {
+    font-size: 1.2rem;
   }
 }

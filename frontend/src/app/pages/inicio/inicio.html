@@ -1,0 +1,75 @@
+<section class="abertura">
+  <h1>Aquele prato do anime, agora na sua porta.</h1>
+  <p>Cozinha só de delivery. Você pede pelo site e acompanha o preparo até sair para entrega.</p>
+</section>
+
+<nav class="filtros" aria-label="Filtrar por categoria">
+  <button type="button" class="filtro" [class.ativo]="categoriaId() === null" (click)="filtrar(null)">
+    Tudo
+  </button>
+  @for (categoria of categorias(); track categoria.id) {
+    <button
+      type="button"
+      class="filtro"
+      [class.ativo]="categoriaId() === categoria.id"
+      (click)="filtrar(categoria.id)"
+    >
+      {{ categoria.nome }}
+    </button>
+  }
+</nav>
+
+@for (secao of secoes(); track secao.nome) {
+  <section class="secao">
+    <h2>
+      <span class="kanji" aria-hidden="true">{{ secao.kanji }}</span>
+      {{ secao.nome }}
+    </h2>
+
+    <ul class="pratos">
+      @for (prato of secao.pratos; track prato.id) {
+        <li>
+          <a class="prato" [routerLink]="['/prato', prato.id]">
+            <div class="foto">
+              @if (prato.fotoUrl) {
+                <img [src]="prato.fotoUrl" alt="" loading="lazy" />
+              } @else {
+                <span aria-hidden="true">{{ secao.kanji }}</span>
+              }
+            </div>
+
+            <div class="texto">
+              <h3>{{ prato.nome }}</h3>
+              @if (prato.anime && prato.anime !== 'Original') {
+                <p class="origem">Visto em {{ prato.anime }}</p>
+              } @else {
+                <p class="origem">Criação da casa</p>
+              }
+              <p class="descricao">{{ prato.descricao }}</p>
+            </div>
+
+            <div class="rodape">
+              <span class="preco">{{ prato.preco | brl }}</span>
+              <span class="tempo">{{ prato.tempoPreparoMin }} min</span>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+}
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando o cardápio...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>O cardápio não carregou. A cozinha pode estar abrindo: espere um minuto e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (pratos().length === 0) {
+  <p class="estado">Nenhum prato nesta categoria por enquanto. Veja as outras nos filtros acima.</p>
+} @else if (temMais()) {
+  <div class="estado">
+    <button mat-stroked-button type="button" (click)="verMais()">Ver mais pratos</button>
+  </div>
+}
