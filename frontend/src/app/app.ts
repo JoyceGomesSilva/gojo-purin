@@ -1,22 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../environments/environment';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { AuthService } from './core/auth.service';
 
+// A "moldura" do site: a barra do topo e, embaixo, a tela da rota atual.
 @Component({
   selector: 'app-root',
+  imports: [RouterOutlet, RouterLink, MatToolbarModule, MatButtonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  private http = inject(HttpClient);
-  mensagem = signal('Conectando com a cozinha...');
+  protected auth = inject(AuthService);
+  private router = inject(Router);
 
-  constructor() {
-    this.http
-      .get(`${environment.apiUrl}/api/ping`, { responseType: 'text' })
-      .subscribe({
-        next: (texto) => this.mensagem.set(texto),
-        error: () => this.mensagem.set('Não consegui falar com o back-end.')
-      });
+  sair(): void {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 }
