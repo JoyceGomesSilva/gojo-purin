@@ -360,3 +360,85 @@ export interface FichaTecnicaRequest {
   modoPreparo: string;
   itens: FichaTecnicaItemRequest[];
 }
+
+// ---------- Painel: estoque ----------
+
+export type UnidadeIngrediente = 'G' | 'ML' | 'UN' | 'KG' | 'L';
+
+// Ingrediente completo, como vem de /api/admin/ingredientes (IngredienteResponse no back).
+export interface Ingrediente {
+  id: number;
+  nome: string;
+  sku: string;
+  unidadePadrao: UnidadeIngrediente;
+  estoqueMinimo: number;
+  custoUnitario: number;
+  status: 'ATIVO' | 'INATIVO';
+}
+
+export interface IngredienteRequest {
+  nome: string;
+  sku: string;
+  unidadePadrao: UnidadeIngrediente;
+  estoqueMinimo: number;
+  custoUnitario: number;
+  status: 'ATIVO' | 'INATIVO';
+}
+
+// Filtros da lista de ingredientes. Texto vazio = sem filtro.
+export interface FiltrosDeIngrediente {
+  status: string;
+  busca: string;
+}
+
+// Saldo atual de um ingrediente (SaldoResponse no back).
+export interface SaldoEstoque {
+  ingredienteId: number;
+  nome: string;
+  sku: string;
+  unidade: string;
+  saldo: number;
+  estoqueMinimo: number;
+  custoUnitario: number;
+  abaixoDoMinimo: boolean;
+}
+
+export type TipoMovimentacao = 'ENTRADA' | 'SAIDA' | 'ESTORNO';
+export type MotivoPerda = 'DESPERDICIO' | 'VENCIMENTO' | 'QUEBRA' | 'USO_INTERNO';
+
+// O que o front envia para registrar uma entrada ou saida manual.
+export interface MovimentacaoRequest {
+  ingredienteId: number;
+  tipo: 'ENTRADA' | 'SAIDA';
+  quantidade: number;
+  // So na saida.
+  motivo: MotivoPerda | null;
+  // Os tres abaixo so na entrada.
+  lote: string | null;
+  validade: string | null;
+  custoUnitario: number | null;
+}
+
+// Uma linha do historico de estoque (MovimentacaoResponse no back).
+export interface Movimentacao {
+  id: number;
+  dataHora: string;
+  ingredienteId: number;
+  ingredienteNome: string;
+  unidade: string;
+  tipo: TipoMovimentacao;
+  motivo: string;
+  quantidade: number;
+  lote: string | null;
+  validade: string | null;
+  custoUnitario: number | null;
+  usuarioNome: string;
+  pedidoId: number | null;
+  pedidoCompraId: number | null;
+}
+
+// Filtros do historico. Texto vazio = sem filtro.
+export interface FiltrosDeMovimentacao {
+  ingredienteId: string;
+  tipo: string;
+}

@@ -20,6 +20,17 @@ public interface FichaTecnicaRepository extends JpaRepository<FichaTecnica, Long
             """)
     List<FichaTecnica> buscarPorPratos(@Param("pratoIds") Collection<Long> pratoIds);
 
+    // Os nomes dos pratos ATIVOS que usam um ingrediente. Serve para impedir
+    // que um ingrediente em uso no cardapio seja desativado.
+    @Query("""
+            select distinct p.nome from FichaTecnicaItem i
+            join i.fichaTecnica f
+            join f.prato p
+            where i.ingrediente.id = :ingredienteId and p.status = 'ATIVO'
+            order by p.nome
+            """)
+    List<String> nomesDosPratosAtivosQueUsam(@Param("ingredienteId") Long ingredienteId);
+
     // A ficha de um prato, se existir.
     // SELECT * FROM ficha_tecnica WHERE prato_id = ?
     Optional<FichaTecnica> findByPratoId(Long pratoId);

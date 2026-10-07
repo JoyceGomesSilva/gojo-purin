@@ -8,6 +8,15 @@
   @if (gestao()) {
     <a routerLink="/admin/pratos" routerLinkActive="ativo">Cardápio</a>
     <a routerLink="/admin/categorias" routerLinkActive="ativo">Categorias</a>
+    <a routerLink="/admin/estoque" routerLinkActive="ativo">
+      Estoque
+      @if (totalAlertas() > 0) {
+        <span class="selo" [attr.aria-label]="totalAlertas() + ' ingredientes abaixo do mínimo'">
+          {{ totalAlertas() }}
+        </span>
+      }
+    </a>
+    <a routerLink="/admin/ingredientes" routerLinkActive="ativo">Ingredientes</a>
   }
   @if (admin()) {
     <a routerLink="/admin/usuarios" routerLinkActive="ativo">Usuários</a>

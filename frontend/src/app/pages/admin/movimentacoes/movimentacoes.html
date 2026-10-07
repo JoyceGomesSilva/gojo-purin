@@ -1,0 +1,101 @@
+<a class="voltar" routerLink="/admin/estoque">← Voltar para o estoque</a>
+
+<div class="cabecalho">
+  <h1>Movimentações do estoque</h1>
+</div>
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Ingrediente</span>
+    <select [value]="filtros().ingredienteId" (change)="filtrar('ingredienteId', $event)">
+      <option value="">Todos</option>
+      @for (ingrediente of ingredientes(); track ingrediente.ingredienteId) {
+        <option [value]="ingrediente.ingredienteId">{{ ingrediente.nome }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Tipo</span>
+    <select [value]="filtros().tipo" (change)="filtrar('tipo', $event)">
+      <option value="">Todos</option>
+      <option value="ENTRADA">Entradas</option>
+      <option value="SAIDA">Saídas</option>
+      <option value="ESTORNO">Estornos</option>
+    </select>
+  </label>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando as movimentações...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar as movimentações. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (movimentacoes().length === 0) {
+  <p class="estado">Nenhuma movimentação com estes filtros.</p>
+} @else {
+  <p class="contagem">{{ total() }} {{ total() === 1 ? 'movimentação' : 'movimentações' }}</p>
+
+  <ul class="lista">
+    @for (movimentacao of movimentacoes(); track movimentacao.id) {
+      <li class="linha">
+        <div class="dados">
+          <h2>
+            {{ movimentacao.tipo === 'SAIDA' ? '−' : '+' }}
+            {{ formatarQuantidade(movimentacao.quantidade, movimentacao.unidade) }} de
+            {{ movimentacao.ingredienteNome }}
+          </h2>
+          <p>{{ movimentacao.dataHora | dataHora }} · por {{ movimentacao.usuarioNome }}</p>
+          @if (movimentacao.pedidoId) {
+            <p>
+              Referência:
+              <a [routerLink]="['/admin/pedidos', movimentacao.pedidoId]">Pedido nº {{ movimentacao.pedidoId }}</a>
+            </p>
+          }
+          @if (movimentacao.pedidoCompraId) {
+            <p>Referência: Compra nº {{ movimentacao.pedidoCompraId }}</p>
+          }
+          @if (movimentacao.lote || movimentacao.validade) {
+            <p>
+              @if (movimentacao.lote) {
+                Lote {{ movimentacao.lote }}
+              }
+              @if (movimentacao.validade) {
+                · Validade {{ movimentacao.validade.split('-').reverse().join('/') }}
+              }
+            </p>
+          }
+          @if (movimentacao.tipo === 'ENTRADA' && movimentacao.custoUnitario !== null) {
+            <p>Custo total: {{ movimentacao.quantidade * movimentacao.custoUnitario | brl }}</p>
+          }
+        </div>
+
+        <div class="etiquetas">
+          <span [class]="'etiqueta ' + (movimentacao.tipo === 'SAIDA' ? 'inativo' : 'ativo')">
+            {{ nomeDoTipo(movimentacao.tipo) }}
+          </span>
+          <span class="etiqueta">{{ nomeDoMotivo(movimentacao.motivo) }}</span>
+        </div>
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

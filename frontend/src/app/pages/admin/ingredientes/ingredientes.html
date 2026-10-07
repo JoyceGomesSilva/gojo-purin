@@ -1,0 +1,154 @@
+<div class="cabecalho">
+  <h1>Ingredientes</h1>
+  @if (!formAberto()) {
+    <button mat-flat-button type="button" (click)="novo()">Novo ingrediente</button>
+  }
+</div>
+
+@if (formAberto()) {
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>{{ editando() ? 'Editar ' + editando()!.nome : 'Novo ingrediente' }}</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" autocomplete="off" />
+        @if (form.controls.nome.hasError('required')) {
+          <mat-error>Informe o nome</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>SKU (código do item)</mat-label>
+        <input matInput formControlName="sku" placeholder="Ex.: ING-056" autocomplete="off" />
+        @if (form.controls.sku.hasError('required')) {
+          <mat-error>Informe o SKU</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Unidade padrão</mat-label>
+        <mat-select formControlName="unidadePadrao">
+          <mat-option value="G">Grama (g)</mat-option>
+          <mat-option value="ML">Mililitro (ml)</mat-option>
+          <mat-option value="UN">Unidade (un)</mat-option>
+          <mat-option value="KG">Quilo (kg)</mat-option>
+          <mat-option value="L">Litro (l)</mat-option>
+        </mat-select>
+        <mat-hint>
+          {{ editando()
+            ? 'Não pode mudar depois de criado'
+            : 'É nela que o saldo, as fichas e o custo são contados' }}
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estoque mínimo</mat-label>
+        <input matInput type="number" formControlName="estoqueMinimo" min="0" step="any" />
+        <mat-hint>Abaixo disso o sistema alerta</mat-hint>
+        @if (form.controls.estoqueMinimo.invalid) {
+          <mat-error>Informe zero ou mais</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Custo unitário (R$)</mat-label>
+        <input matInput type="number" formControlName="custoUnitario" min="0" step="any" />
+        <mat-hint>Custo de 1 unidade padrão (1 g, 1 ml, 1 un...)</mat-hint>
+        @if (form.controls.custoUnitario.invalid) {
+          <mat-error>Informe zero ou mais</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="ATIVO">Ativo</mat-option>
+          <mat-option value="INATIVO">Inativo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : editando() ? 'Salvar alterações' : 'Criar ingrediente' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharForm()">Cancelar</button>
+    </div>
+  </form>
+}
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Nome ou SKU</span>
+    <input type="search" placeholder="Ex.: arroz" [value]="filtros().busca" (change)="filtrar('busca', $event)" />
+  </label>
+
+  <label>
+    <span>Status</span>
+    <select [value]="filtros().status" (change)="filtrar('status', $event)">
+      <option value="">Todos</option>
+      <option value="ATIVO">Ativos</option>
+      <option value="INATIVO">Inativos</option>
+    </select>
+  </label>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando os ingredientes...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar os ingredientes. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (ingredientes().length === 0) {
+  <p class="estado">Nenhum ingrediente com estes filtros.</p>
+} @else {
+  <p class="contagem">
+    {{ totalIngredientes() }} {{ totalIngredientes() === 1 ? 'ingrediente' : 'ingredientes' }}
+  </p>
+
+  <ul class="lista">
+    @for (ingrediente of ingredientes(); track ingrediente.id) {
+      <li class="linha" [class.inativo]="ingrediente.status === 'INATIVO'">
+        <div class="dados">
+          <h2>{{ ingrediente.nome }}</h2>
+          <p>{{ ingrediente.sku }} · {{ formatarCustoUnitario(ingrediente.custoUnitario, ingrediente.unidadePadrao) }}</p>
+          <p>Estoque mínimo: {{ formatarQuantidade(ingrediente.estoqueMinimo, ingrediente.unidadePadrao) }}</p>
+        </div>
+
+        <div class="etiquetas">
+          <span [class]="'etiqueta ' + ingrediente.status.toLowerCase()">
+            {{ ingrediente.status === 'ATIVO' ? 'Ativo' : 'Inativo' }}
+          </span>
+        </div>
+
+        <div class="botoes">
+          <button mat-stroked-button type="button" [disabled]="enviando()" (click)="editar(ingrediente)">Editar</button>
+          @if (ingrediente.status === 'ATIVO') {
+            <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="desativar(ingrediente)">
+              Desativar
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

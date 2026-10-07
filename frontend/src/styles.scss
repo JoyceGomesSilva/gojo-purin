@@ -57,6 +57,15 @@ body {
   --mat-sys-title-medium-font: var(--gp-fonte-texto);
   --mat-sys-title-small-font: var(--gp-fonte-texto);
 
+  // Cantos arredondados. O Angular Material le estes valores para decidir o
+  // formato dos componentes; "full" e o dos botoes (formato de pilula).
+  --mat-sys-corner-extra-small: 4px;
+  --mat-sys-corner-small: 8px;
+  --mat-sys-corner-medium: 12px;
+  --mat-sys-corner-large: 16px;
+  --mat-sys-corner-extra-large: 28px;
+  --mat-sys-corner-full: 999px;
+
   margin: 0;
   background: var(--gp-fundo);
   color: var(--gp-tinta);
@@ -73,4 +82,11 @@ a {
 :focus-visible {
   outline: 3px solid var(--gp-primaria);
   outline-offset: 3px;
+}
+
+// Todos os botoes do site com borda arredondada (pilula), inclusive os links
+// com aparencia de botao. Garante o formato mesmo se o Material mudar o padrao.
+button.mat-mdc-button-base,
+a.mat-mdc-button-base {
+  border-radius: 999px;
 }

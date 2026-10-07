@@ -1,0 +1,227 @@
+<div class="cabecalho">
+  <h1>Estoque</h1>
+  <div class="atalhos">
+    @if (!criando()) {
+      <button mat-flat-button type="button" (click)="abrirNovo()">Novo ingrediente</button>
+    }
+    <a mat-stroked-button routerLink="/admin/estoque/movimentacoes">Ver movimentações</a>
+    <a mat-stroked-button routerLink="/admin/ingredientes">Ingredientes</a>
+  </div>
+</div>
+
+@if (criando()) {
+  <form class="formulario" [formGroup]="formNovo" (ngSubmit)="salvarNovo()">
+    <h2>Novo ingrediente</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" autocomplete="off" />
+        @if (formNovo.controls.nome.hasError('required')) {
+          <mat-error>Informe o nome</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>SKU (código do item)</mat-label>
+        <input matInput formControlName="sku" placeholder="Ex.: ING-056" autocomplete="off" />
+        @if (formNovo.controls.sku.hasError('required')) {
+          <mat-error>Informe o SKU</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Unidade padrão</mat-label>
+        <mat-select formControlName="unidadePadrao">
+          <mat-option value="G">Grama (g)</mat-option>
+          <mat-option value="ML">Mililitro (ml)</mat-option>
+          <mat-option value="UN">Unidade (un)</mat-option>
+          <mat-option value="KG">Quilo (kg)</mat-option>
+          <mat-option value="L">Litro (l)</mat-option>
+        </mat-select>
+        <mat-hint>Não pode mudar depois de criado</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estoque mínimo</mat-label>
+        <input matInput type="number" formControlName="estoqueMinimo" min="0" step="any" />
+        <span matTextSuffix>{{ formNovo.controls.unidadePadrao.value.toLowerCase() }}</span>
+        <mat-hint>Abaixo disso o sistema alerta</mat-hint>
+        @if (formNovo.controls.estoqueMinimo.invalid) {
+          <mat-error>Informe zero ou mais</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Custo unitário (R$)</mat-label>
+        <input matInput type="number" formControlName="custoUnitario" min="0" step="any" />
+        <mat-hint>Custo de 1 {{ formNovo.controls.unidadePadrao.value.toLowerCase() }}</mat-hint>
+        @if (formNovo.controls.custoUnitario.invalid) {
+          <mat-error>Informe zero ou mais</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estoque inicial (opcional)</mat-label>
+        <input matInput type="number" formControlName="quantidadeInicial" min="0" step="any" />
+        <span matTextSuffix>{{ formNovo.controls.unidadePadrao.value.toLowerCase() }}</span>
+        <mat-hint>Quanto já tem na cozinha. Vira uma entrada no estoque.</mat-hint>
+        @if (formNovo.controls.quantidadeInicial.invalid) {
+          <mat-error>Informe zero ou mais</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Lote do estoque inicial (opcional)</mat-label>
+        <input matInput formControlName="lote" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Validade do estoque inicial (opcional)</mat-label>
+        <input matInput type="date" formControlName="validade" />
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : 'Adicionar ao estoque' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharNovo()">Cancelar</button>
+    </div>
+  </form>
+}
+
+@if (movimentando(); as item) {
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>{{ tipo() === 'ENTRADA' ? 'Entrada de ' : 'Saída de ' }}{{ item.nome }}</h2>
+    <p class="contagem">Saldo atual: {{ formatarQuantidade(item.saldo, item.unidade) }}</p>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Quantidade</mat-label>
+        <input matInput type="number" formControlName="quantidade" min="0" step="any" />
+        <span matTextSuffix>{{ item.unidade.toLowerCase() }}</span>
+        @if (form.controls.quantidade.invalid) {
+          <mat-error>Informe uma quantidade maior que zero</mat-error>
+        }
+      </mat-form-field>
+
+      @if (tipo() === 'SAIDA') {
+        <mat-form-field appearance="outline">
+          <mat-label>Motivo</mat-label>
+          <mat-select formControlName="motivo">
+            <mat-option value="DESPERDICIO">Desperdício</mat-option>
+            <mat-option value="VENCIMENTO">Vencimento</mat-option>
+            <mat-option value="QUEBRA">Quebra</mat-option>
+            <mat-option value="USO_INTERNO">Uso interno</mat-option>
+          </mat-select>
+          @if (form.controls.motivo.hasError('required')) {
+            <mat-error>Escolha o motivo</mat-error>
+          }
+        </mat-form-field>
+      } @else {
+        <mat-form-field appearance="outline">
+          <mat-label>Lote (opcional)</mat-label>
+          <input matInput formControlName="lote" autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Validade (opcional)</mat-label>
+          <input matInput type="date" formControlName="validade" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Custo unitário (R$)</mat-label>
+          <input matInput type="number" formControlName="custoUnitario" min="0" step="any" />
+          <mat-hint>Quanto custou 1 {{ item.unidade.toLowerCase() }} nesta entrada</mat-hint>
+          @if (form.controls.custoUnitario.invalid) {
+            <mat-error>Informe zero ou mais</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : tipo() === 'ENTRADA' ? 'Registrar entrada' : 'Registrar saída' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharForm()">Cancelar</button>
+    </div>
+  </form>
+}
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando o estoque...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar o estoque. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else {
+  @if (alertas().length > 0) {
+    <section class="alertas" role="alert">
+      <h2>
+        {{ alertas().length }}
+        {{ alertas().length === 1 ? 'ingrediente abaixo do mínimo' : 'ingredientes abaixo do mínimo' }}
+      </h2>
+      <ul>
+        @for (alerta of alertas(); track alerta.ingredienteId) {
+          <li>
+            <strong>{{ alerta.nome }}</strong>: há {{ formatarQuantidade(alerta.saldo, alerta.unidade) }}, o mínimo
+            é {{ formatarQuantidade(alerta.estoqueMinimo, alerta.unidade) }}
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <div class="filtros" role="group" aria-label="Filtros">
+    <label>
+      <span>Nome ou SKU</span>
+      <input type="search" placeholder="Ex.: arroz" [value]="busca()" (input)="digitarBusca($event)" />
+    </label>
+
+    <label class="marcar">
+      <input type="checkbox" [checked]="soAbaixoDoMinimo()" (change)="marcarSoAbaixo($event)" />
+      <span>Só abaixo do mínimo</span>
+    </label>
+  </div>
+
+  @if (visiveis().length === 0) {
+    <p class="estado">Nenhum ingrediente com estes filtros.</p>
+  } @else {
+    <p class="contagem">{{ visiveis().length }} {{ visiveis().length === 1 ? 'ingrediente' : 'ingredientes' }}</p>
+
+    <ul class="lista">
+      @for (item of visiveis(); track item.ingredienteId) {
+        <li class="linha">
+          <div class="dados">
+            <h2>{{ item.nome }}</h2>
+            <p>
+              Saldo: <strong>{{ formatarQuantidade(item.saldo, item.unidade) }}</strong> · Mínimo:
+              {{ formatarQuantidade(item.estoqueMinimo, item.unidade) }}
+            </p>
+            <p>{{ item.sku }}</p>
+          </div>
+
+          <div class="etiquetas">
+            @if (item.abaixoDoMinimo) {
+              <span class="etiqueta inativo">Abaixo do mínimo</span>
+            } @else {
+              <span class="etiqueta ativo">Em dia</span>
+            }
+          </div>
+
+          <div class="botoes">
+            <button mat-stroked-button type="button" [disabled]="enviando()" (click)="abrirEntrada(item)">
+              Entrada
+            </button>
+            <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="abrirSaida(item)">
+              Saída
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+}

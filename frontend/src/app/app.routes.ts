@@ -74,6 +74,23 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/ficha/ficha').then((m) => m.AdminFicha)
       },
       {
+        // Estoque (RF-027 a RF-033): saldo, historico e ingredientes.
+        path: 'estoque',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/estoque/estoque').then((m) => m.AdminEstoque)
+      },
+      {
+        path: 'estoque/movimentacoes',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () =>
+          import('./pages/admin/movimentacoes/movimentacoes').then((m) => m.AdminMovimentacoes)
+      },
+      {
+        path: 'ingredientes',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/ingredientes/ingredientes').then((m) => m.AdminIngredientes)
+      },
+      {
         path: 'categorias',
         canActivate: [roleGuard('ADMIN', 'GERENTE')],
         loadComponent: () => import('./pages/admin/categorias/categorias').then((m) => m.AdminCategorias)
