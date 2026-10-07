@@ -11,7 +11,8 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
-// O que o painel envia para criar ou editar um prato (RF-010 e RF-014).
+// O que o painel envia para criar ou editar um prato (RF-010).
+// O modo de preparo (RF-014) e preenchido na tela da ficha tecnica.
 public record AdminPratoRequest(
         @NotBlank(message = "Informe o nome")
         @Size(max = 120, message = "Nome muito longo")
@@ -48,10 +49,6 @@ public record AdminPratoRequest(
         String anime,
 
         @Size(max = 80, message = "Nome do personagem muito longo")
-        String personagem,
-
-        // RF-014: instrucoes passo a passo. Fica guardado na ficha tecnica do prato.
-        @Size(max = 5000, message = "Modo de preparo muito longo")
-        String modoPreparo
+        String personagem
 ) {
 }

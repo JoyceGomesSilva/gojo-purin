@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Regras do CRUD de pratos no painel (RF-010 e RF-014).
+// Regras do CRUD de pratos no painel (RF-010).
 // O cardapio publico continua no CardapioService.
 @Service
 public class PratoService {
@@ -88,8 +88,8 @@ public class PratoService {
         preencher(prato, request);
         prato = pratoRepository.save(prato);
 
-        FichaTecnica ficha = guardarModoPreparo(prato, null, request.modoPreparo());
-        return AdminPratoResponse.de(prato, ficha);
+        // null = ainda sem ficha tecnica.
+        return AdminPratoResponse.de(prato, null);
     }
 
     @Transactional
@@ -105,8 +105,23 @@ public class PratoService {
 
         preencher(prato, request);
         prato = pratoRepository.save(prato);
+        return AdminPratoResponse.de(prato, ficha);
+    }
 
-        ficha = guardarModoPreparo(prato, ficha, request.modoPreparo());
+    // Troca so o status, sem mexer no resto (o botao "Ativar" do painel).
+    @Transactional
+    public AdminPratoResponse mudarStatus(Long id, String status) {
+        Prato prato = buscar(id);
+        FichaTecnica ficha = fichaTecnicaRepository.findByPratoId(id).orElse(null);
+
+        // RN01 vale aqui tambem.
+        boolean temIngredientes = ficha != null && !ficha.getItens().isEmpty();
+        if ("ATIVO".equals(status) && !temIngredientes) {
+            throw semFicha();
+        }
+
+        prato.setStatus(status);
+        prato = pratoRepository.save(prato);
         return AdminPratoResponse.de(prato, ficha);
     }
 
@@ -132,23 +147,6 @@ public class PratoService {
         prato.setAnime(limpar(request.anime()));
         prato.setPersonagem(limpar(request.personagem()));
         prato.setStatus(request.status());
-    }
-
-    // O modo de preparo mora na tabela ficha_tecnica (secao 5 do SRS).
-    // Se o prato ainda nao tem ficha e o texto veio preenchido, cria uma ficha
-    // vazia (sem ingredientes) so para guardar o texto.
-    // Devolve a ficha, ou null se o prato continua sem nenhuma.
-    private FichaTecnica guardarModoPreparo(Prato prato, FichaTecnica ficha, String texto) {
-        String modoPreparo = limpar(texto);
-        if (ficha == null) {
-            if (modoPreparo == null) {
-                return null;
-            }
-            ficha = new FichaTecnica();
-            ficha.setPrato(prato);
-        }
-        ficha.setModoPreparo(modoPreparo);
-        return fichaTecnicaRepository.save(ficha);
     }
 
     // Monta um "dicionario": id do prato -> ficha dele.

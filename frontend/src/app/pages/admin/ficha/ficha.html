@@ -1,0 +1,165 @@
+<a class="voltar" routerLink="/admin/pratos">← Voltar para o cardápio</a>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando a ficha técnica...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar a ficha técnica. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else {
+  @if (calculo(); as ficha) {
+    <h1>Ficha técnica: {{ ficha.pratoNome }}</h1>
+
+    <!-- Situacao do prato no cardapio, com o atalho para ativar. -->
+    <div class="situacao">
+      @if (ficha.pratoStatus === 'ATIVO') {
+        <p><span class="etiqueta ativo">Ativo</span> Este prato está no cardápio.</p>
+      } @else {
+        <p>
+          <span class="etiqueta inativo">{{ ficha.pratoStatus === 'PAUSADO' ? 'Pausado' : 'Inativo' }}</span>
+          @if (pendente() || ficha.itens.length === 0) {
+            Este prato está fora do cardápio. Salve a ficha com pelo menos 1 ingrediente para poder ativar.
+          } @else {
+            Este prato está fora do cardápio. A ficha está pronta: já pode ativar.
+          }
+        </p>
+        @if (!pendente() && ficha.itens.length > 0) {
+          <button mat-flat-button type="button" [disabled]="enviando()" (click)="ativarPrato()">
+            Ativar prato
+          </button>
+        }
+      }
+    </div>
+
+    <div class="colunas">
+      <!-- Coluna 1: a receita -->
+      <form class="receita" [formGroup]="form" (ngSubmit)="salvar()">
+        <h2>Receita</h2>
+
+        <mat-form-field appearance="outline" class="rendimento">
+          <mat-label>Rendimento (porções)</mat-label>
+          <input matInput type="number" [formControl]="rendimento" min="1" step="1" />
+          <mat-hint>Quantas porções esta receita rende</mat-hint>
+          @if (rendimento.invalid) {
+            <mat-error>Informe de 1 a 1000 porções</mat-error>
+          }
+        </mat-form-field>
+
+        <h3>Ingredientes</h3>
+
+        @if (linhas.length === 0) {
+          <p class="vazio">Nenhum ingrediente ainda. Comece em "Adicionar ingrediente".</p>
+        }
+
+        <ul class="linhas">
+          @for (linha of linhas.controls; track linha; let indice = $index) {
+            <li class="linha">
+              <mat-form-field appearance="outline" class="campo-ingrediente">
+                <mat-label>Ingrediente</mat-label>
+                <mat-select [formControl]="linha.controls.ingredienteId">
+                  @for (ingrediente of ingredientes(); track ingrediente.id) {
+                    <mat-option [value]="ingrediente.id">{{ ingrediente.nome }}</mat-option>
+                  }
+                </mat-select>
+                <mat-hint>{{ custoUnitarioDe(linha) }}</mat-hint>
+                @if (linha.controls.ingredienteId.hasError('required')) {
+                  <mat-error>Escolha o ingrediente</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="campo-numero">
+                <mat-label>Quantidade</mat-label>
+                <input matInput type="number" [formControl]="linha.controls.quantidade" min="0" step="any" />
+                <span matTextSuffix>{{ unidadeDe(linha) }}</span>
+                @if (linha.controls.quantidade.invalid) {
+                  <mat-error>Maior que zero</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="campo-numero">
+                <mat-label>Fator de correção</mat-label>
+                <input matInput type="number" [formControl]="linha.controls.fatorCorrecao" min="1" step="0.05" />
+                <mat-hint>1 = sem perda</mat-hint>
+                @if (linha.controls.fatorCorrecao.invalid) {
+                  <mat-error>De 1 a 9,99</mat-error>
+                }
+              </mat-form-field>
+
+              <p class="custo-linha">
+                <span>Custo</span>
+                <strong>{{ custoDe(linha) === null ? '...' : (custoDe(linha) | brl) }}</strong>
+              </p>
+
+              <button mat-button type="button" class="remover" (click)="removerLinha(indice)">Remover</button>
+            </li>
+          }
+        </ul>
+
+        <button mat-stroked-button type="button" class="adicionar" (click)="adicionarLinha()">
+          Adicionar ingrediente
+        </button>
+
+        <mat-form-field appearance="outline" class="modo-preparo">
+          <mat-label>Modo de preparo</mat-label>
+          <textarea matInput [formControl]="modoPreparo" rows="6"></textarea>
+          <mat-hint>Passo a passo para a cozinha. O cliente não vê.</mat-hint>
+          @if (modoPreparo.hasError('required')) {
+            <mat-error>Informe o modo de preparo</mat-error>
+          } @else if (modoPreparo.hasError('maxlength')) {
+            <mat-error>No máximo 5000 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="botoes">
+          <button mat-flat-button type="submit" [disabled]="enviando()">
+            {{ enviando() ? 'Salvando...' : 'Salvar ficha técnica' }}
+          </button>
+        </div>
+
+        @if (pendente()) {
+          <p class="pendente" role="status">Há mudanças que ainda não foram salvas.</p>
+        }
+      </form>
+
+      <!-- Coluna 2: as contas, sempre calculadas pelo back -->
+      <aside class="resumo" aria-live="polite">
+        <h2>Custo do prato</h2>
+
+        <dl>
+          <div>
+            <dt>Custo total da receita</dt>
+            <dd>{{ ficha.custoTotal | brl }}</dd>
+          </div>
+          <div>
+            <dt>Rendimento</dt>
+            <dd>{{ ficha.rendimento }} {{ ficha.rendimento === 1 ? 'porção' : 'porções' }}</dd>
+          </div>
+          <div class="destaque">
+            <dt>Custo por porção</dt>
+            <dd>{{ ficha.custoPorcao | brl }}</dd>
+          </div>
+          <div>
+            <dt>Preço de venda</dt>
+            <dd>{{ ficha.precoVenda | brl }}</dd>
+          </div>
+        </dl>
+
+        @if (ficha.foodCost !== null && ficha.faixa) {
+          <div [class]="'food-cost ' + ficha.faixa.toLowerCase()">
+            <p class="rotulo">Food cost</p>
+            <p class="valor">{{ porcento(ficha.foodCost) }}</p>
+            <p class="faixa">{{ nomeDaFaixa(ficha.faixa) }}</p>
+          </div>
+          @if (ficha.aviso) {
+            <p class="alerta" role="alert">{{ ficha.aviso }}</p>
+          }
+        } @else {
+          <p class="vazio">Adicione ingredientes para ver o food cost.</p>
+        }
+
+        <p class="nota">Food cost = custo por porção ÷ preço de venda × 100</p>
+      </aside>
+    </div>
+  }
+}

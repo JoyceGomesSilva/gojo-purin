@@ -298,7 +298,6 @@ export interface AdminPratoRequest {
   status: StatusPrato;
   anime: string | null;
   personagem: string | null;
-  modoPreparo: string | null;
 }
 
 // Filtros da lista de pratos do painel. Texto vazio = sem filtro.
@@ -306,4 +305,58 @@ export interface FiltrosDePrato {
   categoriaId: string;
   status: string;
   busca: string;
+}
+
+// ---------- Painel: ficha tecnica e custos ----------
+
+// Ingrediente resumido, para o campo de escolha da ficha (IngredienteOpcaoResponse no back).
+export interface IngredienteOpcao {
+  id: number;
+  nome: string;
+  unidadePadrao: string;
+  custoUnitario: number;
+  status: string;
+}
+
+export type FaixaFoodCost = 'VERDE' | 'AMARELO' | 'VERMELHO';
+
+// Uma linha da ficha, com o custo ja calculado pelo back.
+export interface FichaTecnicaItem {
+  ingredienteId: number;
+  ingredienteNome: string;
+  unidade: string;
+  quantidade: number;
+  fatorCorrecao: number;
+  custoUnitario: number;
+  custo: number;
+}
+
+// A ficha de um prato com todas as contas (FichaTecnicaResponse no back).
+export interface FichaTecnica {
+  pratoId: number;
+  pratoNome: string;
+  pratoStatus: StatusPrato;
+  precoVenda: number;
+  rendimento: number;
+  modoPreparo: string | null;
+  itens: FichaTecnicaItem[];
+  custoTotal: number;
+  custoPorcao: number;
+  // Os tres abaixo vem null enquanto a ficha nao tem ingredientes.
+  foodCost: number | null;
+  faixa: FaixaFoodCost | null;
+  aviso: string | null;
+}
+
+export interface FichaTecnicaItemRequest {
+  ingredienteId: number;
+  quantidade: number;
+  fatorCorrecao: number;
+}
+
+// O que o front envia para salvar ou simular. Nao vai custo: o back calcula tudo.
+export interface FichaTecnicaRequest {
+  rendimento: number;
+  modoPreparo: string;
+  itens: FichaTecnicaItemRequest[];
 }

@@ -62,7 +62,7 @@
           <mat-option value="PAUSADO">Pausado (fora do cardápio por enquanto)</mat-option>
         </mat-select>
         @if (!podeAtivar()) {
-          <mat-hint>Para ativar, o prato precisa de ficha técnica com ingredientes</mat-hint>
+          <mat-hint>Para ativar, preencha antes a ficha técnica (botão na lista)</mat-hint>
         }
       </mat-form-field>
 
@@ -84,11 +84,6 @@
         <input matInput formControlName="personagem" autocomplete="off" />
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="largo">
-        <mat-label>Modo de preparo (opcional)</mat-label>
-        <textarea matInput formControlName="modoPreparo" rows="6"></textarea>
-        <mat-hint>Passo a passo para a cozinha. O cliente não vê.</mat-hint>
-      </mat-form-field>
     </div>
 
     <div class="botoes">
@@ -164,6 +159,10 @@
 
         <div class="botoes">
           <button mat-stroked-button type="button" [disabled]="enviando()" (click)="editar(prato)">Editar</button>
+          <a mat-stroked-button [routerLink]="['/admin/pratos', prato.id, 'ficha']">Ficha técnica</a>
+          @if (prato.status !== 'ATIVO' && prato.temFicha) {
+            <button mat-flat-button type="button" [disabled]="enviando()" (click)="ativar(prato)">Ativar</button>
+          }
           @if (prato.status !== 'INATIVO') {
             <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="desativar(prato)">
               Desativar

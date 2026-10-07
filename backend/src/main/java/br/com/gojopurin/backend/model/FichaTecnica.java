@@ -1,5 +1,6 @@
 package br.com.gojopurin.backend.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,7 +41,10 @@ public class FichaTecnica {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "fichaTecnica")
+    // cascade: ao salvar a ficha, os itens da lista sao salvos junto.
+    // orphanRemoval: um item tirado da lista e apagado do banco.
+    // Assim o service so precisa mexer na lista.
+    @OneToMany(mappedBy = "fichaTecnica", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FichaTecnicaItem> itens = new ArrayList<>();
 
     @PrePersist

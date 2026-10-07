@@ -3,12 +3,14 @@ package br.com.gojopurin.backend.controller;
 import br.com.gojopurin.backend.dto.AdminPratoRequest;
 import br.com.gojopurin.backend.dto.AdminPratoResponse;
 import br.com.gojopurin.backend.dto.PaginaResponse;
+import br.com.gojopurin.backend.dto.PratoStatusRequest;
 import br.com.gojopurin.backend.service.PratoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,6 +58,12 @@ public class AdminPratoController {
     @PutMapping("/{id}")
     public AdminPratoResponse editar(@PathVariable Long id, @RequestBody @Valid AdminPratoRequest request) {
         return pratoService.editar(id, request);
+    }
+
+    // PATCH = alteracao parcial: troca so o status (ativar, pausar, desativar).
+    @PatchMapping("/{id}/status")
+    public AdminPratoResponse mudarStatus(@PathVariable Long id, @RequestBody @Valid PratoStatusRequest request) {
+        return pratoService.mudarStatus(id, request.status());
     }
 
     // DELETE nao apaga a linha: desativa o prato (RN06).

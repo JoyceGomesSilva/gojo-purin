@@ -68,6 +68,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/pratos/pratos').then((m) => m.AdminPratos)
       },
       {
+        // Ficha tecnica e custo de um prato (RF-011 a RF-013).
+        path: 'pratos/:id/ficha',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/ficha/ficha').then((m) => m.AdminFicha)
+      },
+      {
         path: 'categorias',
         canActivate: [roleGuard('ADMIN', 'GERENTE')],
         loadComponent: () => import('./pages/admin/categorias/categorias').then((m) => m.AdminCategorias)

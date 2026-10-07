@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AdminPrato, AdminPratoRequest, FiltrosDePrato, Pagina } from './models';
+import { AdminPrato, AdminPratoRequest, FiltrosDePrato, Pagina, StatusPrato } from './models';
 
 // Conversa com /api/admin/pratos (ADMIN e GERENTE).
 @Injectable({ providedIn: 'root' })
@@ -31,6 +31,11 @@ export class AdminPratoService {
 
   editar(id: number, dados: AdminPratoRequest): Observable<AdminPrato> {
     return this.http.put<AdminPrato>(`${this.url}/${id}`, dados);
+  }
+
+  // Troca so o status (ativar, pausar). O back recusa ATIVO sem ficha tecnica.
+  mudarStatus(id: number, status: StatusPrato): Observable<AdminPrato> {
+    return this.http.patch<AdminPrato>(`${this.url}/${id}/status`, { status });
   }
 
   // O back nao apaga: marca como INATIVO. Responde 204, sem corpo.

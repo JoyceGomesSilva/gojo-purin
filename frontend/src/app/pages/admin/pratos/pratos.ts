@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -30,15 +31,15 @@ const PRATO_EM_BRANCO = {
   status: 'INATIVO' as StatusPrato,
   fotoUrl: '',
   anime: '',
-  personagem: '',
-  modoPreparo: ''
+  personagem: ''
 };
 
-// Pratos do cardapio (RF-010 e RF-014): criar, editar, listar e desativar.
+// Pratos do cardapio (RF-010): criar, editar, listar, ativar e desativar.
+// A receita e o modo de preparo ficam na tela da ficha tecnica.
 // O mesmo formulario serve para criar e para editar.
 @Component({
   selector: 'app-admin-pratos',
-  imports: [ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrlPipe],
+  imports: [ReactiveFormsModule, RouterLink, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrlPipe],
   templateUrl: './pratos.html',
   styleUrl: '../admin-crud.scss'
 })
@@ -81,8 +82,7 @@ export class AdminPratos {
     status: ['INATIVO' as StatusPrato, [Validators.required]],
     fotoUrl: ['', [Validators.maxLength(500), Validators.pattern(/^(https?:\/\/.+)?$/)]],
     anime: ['', [Validators.maxLength(80)]],
-    personagem: ['', [Validators.maxLength(80)]],
-    modoPreparo: ['', [Validators.maxLength(5000)]]
+    personagem: ['', [Validators.maxLength(80)]]
   });
 
   constructor() {
@@ -138,8 +138,7 @@ export class AdminPratos {
       status: prato.status,
       fotoUrl: prato.fotoUrl ?? '',
       anime: prato.anime ?? '',
-      personagem: prato.personagem ?? '',
-      modoPreparo: prato.modoPreparo ?? ''
+      personagem: prato.personagem ?? ''
     });
     this.abrirForm();
   }
@@ -166,8 +165,7 @@ export class AdminPratos {
       status: valores.status,
       fotoUrl: valores.fotoUrl.trim() || null,
       anime: valores.anime.trim() || null,
-      personagem: valores.personagem.trim() || null,
-      modoPreparo: valores.modoPreparo.trim() || null
+      personagem: valores.personagem.trim() || null
     };
 
     const editando = this.editando();
@@ -183,6 +181,22 @@ export class AdminPratos {
       },
       error: (erro: unknown) => {
         // Ex.: 422 ao tentar ativar um prato sem ficha tecnica.
+        this.enviando.set(false);
+        this.aviso.open(mensagemDeErro(erro), 'Fechar', { duration: 8000 });
+      }
+    });
+  }
+
+  // Coloca o prato no cardapio. O botao so aparece para quem ja tem ficha tecnica.
+  ativar(prato: AdminPrato): void {
+    this.enviando.set(true);
+    this.servico.mudarStatus(prato.id, 'ATIVO').subscribe({
+      next: () => {
+        this.enviando.set(false);
+        this.aviso.open(`${prato.nome} está ativo e já aparece no cardápio`, 'OK', { duration: 4000 });
+        this.buscar();
+      },
+      error: (erro: unknown) => {
         this.enviando.set(false);
         this.aviso.open(mensagemDeErro(erro), 'Fechar', { duration: 8000 });
       }
