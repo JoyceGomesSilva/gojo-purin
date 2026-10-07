@@ -1,5 +1,6 @@
 package br.com.gojopurin.backend.config;
 
+import br.com.gojopurin.backend.repository.UsuarioRepository;
 import br.com.gojopurin.backend.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,9 +22,11 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
+    private final UsuarioRepository usuarioRepository;
 
-    public JwtAuthFilter(TokenService tokenService) {
+    public JwtAuthFilter(TokenService tokenService, UsuarioRepository usuarioRepository) {
         this.tokenService = tokenService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -35,13 +38,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (cabecalho != null && cabecalho.startsWith("Bearer ")) {
             String token = cabecalho.substring(7);
 
-            tokenService.validar(token).ifPresent(jwt -> {
-                // O Spring Security espera o perfil com o prefixo ROLE_.
-                String perfil = "ROLE_" + jwt.getClaim("role").asString();
-                UsernamePasswordAuthenticationToken autenticacao = new UsernamePasswordAuthenticationToken(
-                        jwt.getSubject(), null, List.of(new SimpleGrantedAuthority(perfil)));
-                SecurityContextHolder.getContext().setAuthentication(autenticacao);
-            });
+            // O token vale por 8 horas. Se so confiassemos nele, um usuario
+            // desativado (ou que mudou de perfil) continuaria entrando ate o
+            // token vencer. Por isso conferimos no banco, a cada chamada, se
+            // a conta ainda esta ATIVA, e usamos o perfil ATUAL dela.
+            tokenService.validar(token)
+                    .flatMap(jwt -> usuarioRepository.findByEmail(jwt.getSubject()))
+                    .filter(usuario -> "ATIVO".equals(usuario.getStatus()))
+                    .ifPresent(usuario -> {
+                        // O Spring Security espera o perfil com o prefixo ROLE_.
+                        String perfil = "ROLE_" + usuario.getPerfil().name();
+                        UsernamePasswordAuthenticationToken autenticacao = new UsernamePasswordAuthenticationToken(
+                                usuario.getEmail(), null, List.of(new SimpleGrantedAuthority(perfil)));
+                        SecurityContextHolder.getContext().setAuthentication(autenticacao);
+                    });
         }
 
         // Segue para o proximo passo, com ou sem usuario identificado.

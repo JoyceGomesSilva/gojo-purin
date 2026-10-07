@@ -60,6 +60,12 @@ export const routes: Routes = [
         path: 'pedidos/:id',
         loadComponent: () =>
           import('./pages/admin/pedido-detalhe/pedido-detalhe').then((m) => m.AdminPedidoDetalhe)
+      },
+      {
+        // Dentro do painel, esta tela e so do ADMIN (RF-041).
+        path: 'usuarios',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () => import('./pages/admin/usuarios/usuarios').then((m) => m.AdminUsuarios)
       }
     ]
   },

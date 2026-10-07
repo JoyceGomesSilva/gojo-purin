@@ -5,6 +5,9 @@
 
 <nav class="menu" aria-label="Seções do painel">
   <a routerLink="/admin/pedidos" routerLinkActive="ativo">Pedidos</a>
+  @if (admin()) {
+    <a routerLink="/admin/usuarios" routerLinkActive="ativo">Usuários</a>
+  }
 </nav>
 
 <router-outlet />

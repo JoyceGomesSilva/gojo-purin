@@ -1,0 +1,152 @@
+<div class="cabecalho">
+  <h1>Usuários da equipe</h1>
+  @if (!formAberto()) {
+    <button mat-flat-button type="button" (click)="novo()">Novo usuário</button>
+  }
+</div>
+
+@if (formAberto()) {
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>{{ editando() ? 'Editar ' + editando()!.nome : 'Novo usuário' }}</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome completo</mat-label>
+        <input matInput formControlName="nome" autocomplete="off" />
+        @if (form.controls.nome.hasError('required')) {
+          <mat-error>Informe o nome</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail (usado no login)</mat-label>
+        <input matInput type="email" formControlName="email" autocomplete="off" />
+        @if (form.controls.email.hasError('required')) {
+          <mat-error>Informe o e-mail</mat-error>
+        } @else if (form.controls.email.hasError('email')) {
+          <mat-error>E-mail inválido</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Perfil</mat-label>
+        <mat-select formControlName="perfil">
+          <mat-option value="COZINHEIRO">Cozinheiro</mat-option>
+          <mat-option value="GERENTE">Gerente</mat-option>
+        </mat-select>
+        <mat-hint>
+          {{ form.controls.perfil.value === 'GERENTE'
+            ? 'Pedidos, estoque, fornecedores e dashboard'
+            : 'Vê os pedidos e muda o status do preparo' }}
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone (opcional)</mat-label>
+        <input matInput type="tel" formControlName="telefone" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ editando() ? 'Nova senha (opcional)' : 'Senha' }}</mat-label>
+        <input matInput type="password" formControlName="senha" autocomplete="new-password" />
+        <mat-hint>
+          {{ editando() ? 'Deixe em branco para manter a senha atual' : 'Mínimo de 6 caracteres' }}
+        </mat-hint>
+        @if (form.controls.senha.hasError('required')) {
+          <mat-error>Informe a senha</mat-error>
+        } @else if (form.controls.senha.hasError('minlength')) {
+          <mat-error>A senha precisa ter pelo menos 6 caracteres</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : editando() ? 'Salvar alterações' : 'Criar usuário' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharForm()">Cancelar</button>
+    </div>
+  </form>
+}
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Perfil</span>
+    <select [value]="filtros().perfil" (change)="filtrar('perfil', $event)">
+      <option value="">Todos</option>
+      <option value="GERENTE">Gerente</option>
+      <option value="COZINHEIRO">Cozinheiro</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Situação</span>
+    <select [value]="filtros().status" (change)="filtrar('status', $event)">
+      <option value="">Todas</option>
+      <option value="ATIVO">Ativos</option>
+      <option value="INATIVO">Inativos</option>
+    </select>
+  </label>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando os usuários...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar os usuários. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (usuarios().length === 0) {
+  <p class="estado">Nenhum usuário por aqui ainda. Crie o primeiro em "Novo usuário".</p>
+} @else {
+  <p class="contagem">{{ totalUsuarios() }} {{ totalUsuarios() === 1 ? 'usuário' : 'usuários' }}</p>
+
+  <ul class="usuarios">
+    @for (usuario of usuarios(); track usuario.id) {
+      <li class="usuario" [class.inativo]="usuario.status === 'INATIVO'">
+        <div class="dados">
+          <h2>{{ usuario.nome }}</h2>
+          <p>{{ usuario.email }}</p>
+          @if (usuario.telefone) {
+            <p>{{ usuario.telefone }}</p>
+          }
+        </div>
+
+        <div class="etiquetas">
+          <span class="etiqueta">{{ nomeDoPerfil(usuario.perfil) }}</span>
+          <span [class]="'etiqueta ' + usuario.status.toLowerCase()">
+            {{ usuario.status === 'ATIVO' ? 'Ativo' : 'Inativo' }}
+          </span>
+        </div>
+
+        <div class="botoes">
+          <button mat-stroked-button type="button" [disabled]="enviando()" (click)="editar(usuario)">Editar</button>
+          @if (usuario.status === 'ATIVO') {
+            <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="desativar(usuario)">
+              Desativar
+            </button>
+          } @else {
+            <button mat-button type="button" [disabled]="enviando()" (click)="reativar(usuario)">Reativar</button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

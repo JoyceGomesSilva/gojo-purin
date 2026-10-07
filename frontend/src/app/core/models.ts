@@ -217,3 +217,35 @@ export interface FiltrosDePedido {
   de: string;
   ate: string;
 }
+
+// ---------- Painel: usuarios internos ----------
+
+// Os perfis que o admin cria pelo painel.
+export type PerfilInterno = 'GERENTE' | 'COZINHEIRO';
+
+// Usuario interno como vem de /api/admin/usuarios (UsuarioResponse no back).
+// Nao existe campo de senha: o back nunca devolve.
+export interface UsuarioInterno {
+  id: number;
+  nome: string;
+  email: string;
+  perfil: PerfilInterno;
+  telefone: string | null;
+  status: 'ATIVO' | 'INATIVO';
+  criadoEm: string;
+}
+
+// O que o front envia para criar ou editar. Na edicao, senha null = manter a atual.
+export interface UsuarioInternoRequest {
+  nome: string;
+  email: string;
+  perfil: PerfilInterno;
+  telefone: string | null;
+  senha: string | null;
+}
+
+// Filtros da lista de usuarios. Texto vazio = sem filtro.
+export interface FiltrosDeUsuario {
+  perfil: string;
+  status: string;
+}
