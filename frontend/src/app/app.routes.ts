@@ -62,6 +62,17 @@ export const routes: Routes = [
           import('./pages/admin/pedido-detalhe/pedido-detalhe').then((m) => m.AdminPedidoDetalhe)
       },
       {
+        // Cardapio: so ADMIN e GERENTE. O cozinheiro nao entra.
+        path: 'pratos',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/pratos/pratos').then((m) => m.AdminPratos)
+      },
+      {
+        path: 'categorias',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/categorias/categorias').then((m) => m.AdminCategorias)
+      },
+      {
         // Dentro do painel, esta tela e so do ADMIN (RF-041).
         path: 'usuarios',
         canActivate: [roleGuard('ADMIN')],

@@ -20,6 +20,7 @@ export class AdminLayout {
   private auth = inject(AuthService);
 
   protected perfil = computed(() => NOMES_DOS_PERFIS[this.auth.perfil() ?? ''] ?? '');
-  // Alguns itens do menu so aparecem para o admin.
+  // Alguns itens do menu so aparecem para o admin; outros, para admin e gerente.
+  protected gestao = computed(() => this.auth.perfil() === 'ADMIN' || this.auth.perfil() === 'GERENTE');
   protected admin = computed(() => this.auth.perfil() === 'ADMIN');
 }

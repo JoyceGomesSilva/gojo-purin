@@ -249,3 +249,61 @@ export interface FiltrosDeUsuario {
   perfil: string;
   status: string;
 }
+
+// ---------- Painel: categorias e pratos ----------
+
+// Categoria como vem de /api/admin/categorias (AdminCategoriaResponse no back).
+export interface AdminCategoria {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  ordem: number;
+  status: 'ATIVO' | 'INATIVO';
+}
+
+export interface AdminCategoriaRequest {
+  nome: string;
+  descricao: string | null;
+  ordem: number;
+  status: 'ATIVO' | 'INATIVO';
+}
+
+export type StatusPrato = 'ATIVO' | 'INATIVO' | 'PAUSADO';
+
+// Prato como vem de /api/admin/pratos (AdminPratoResponse no back).
+export interface AdminPrato {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  fotoUrl: string | null;
+  precoVenda: number;
+  tempoPreparoMin: number;
+  anime: string | null;
+  personagem: string | null;
+  categoriaId: number;
+  categoriaNome: string;
+  status: StatusPrato;
+  modoPreparo: string | null;
+  // true = tem ficha tecnica com ingredientes, entao pode ficar ATIVO.
+  temFicha: boolean;
+}
+
+export interface AdminPratoRequest {
+  nome: string;
+  descricao: string | null;
+  fotoUrl: string | null;
+  precoVenda: number;
+  tempoPreparoMin: number;
+  categoriaId: number;
+  status: StatusPrato;
+  anime: string | null;
+  personagem: string | null;
+  modoPreparo: string | null;
+}
+
+// Filtros da lista de pratos do painel. Texto vazio = sem filtro.
+export interface FiltrosDePrato {
+  categoriaId: string;
+  status: string;
+  busca: string;
+}

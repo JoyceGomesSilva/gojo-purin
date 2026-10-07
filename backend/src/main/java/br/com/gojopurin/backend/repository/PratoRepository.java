@@ -4,6 +4,7 @@ import br.com.gojopurin.backend.model.Prato;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,7 +13,9 @@ import java.util.Optional;
 // Consultas do cardapio publico. Todas trazem so pratos ATIVOS (RN09).
 // "join fetch" busca o prato e a categoria dele na mesma consulta.
 // Como a lista e paginada, o Spring tambem precisa de uma consulta de contagem.
-public interface PratoRepository extends JpaRepository<Prato, Long> {
+// JpaSpecificationExecutor serve a lista do painel, que tem filtros opcionais
+// e mostra pratos de qualquer status.
+public interface PratoRepository extends JpaRepository<Prato, Long>, JpaSpecificationExecutor<Prato> {
 
     @Query(value = """
             select p from Prato p join fetch p.categoria c

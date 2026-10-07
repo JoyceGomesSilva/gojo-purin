@@ -34,6 +34,9 @@ public class FichaTecnica {
     @Column(nullable = false)
     private Integer rendimento = 1;
 
+    // Instrucoes passo a passo para a cozinha (RF-014). Texto livre, pode ser longo.
+    private String modoPreparo;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -52,6 +55,9 @@ public class FichaTecnica {
 
     public Integer getRendimento() { return rendimento; }
     public void setRendimento(Integer rendimento) { this.rendimento = rendimento; }
+
+    public String getModoPreparo() { return modoPreparo; }
+    public void setModoPreparo(String modoPreparo) { this.modoPreparo = modoPreparo; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
 

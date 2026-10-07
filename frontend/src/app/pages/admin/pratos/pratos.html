@@ -1,0 +1,193 @@
+<div class="cabecalho">
+  <h1>Cardápio</h1>
+  @if (!formAberto()) {
+    <button mat-flat-button type="button" (click)="novo()">Novo prato</button>
+  }
+</div>
+
+@if (formAberto()) {
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>{{ editando() ? 'Editar ' + editando()!.nome : 'Novo prato' }}</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" autocomplete="off" />
+        @if (form.controls.nome.hasError('required')) {
+          <mat-error>Informe o nome</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="categoriaId">
+          @for (categoria of categorias(); track categoria.id) {
+            <mat-option [value]="categoria.id">
+              {{ categoria.nome }}{{ categoria.status === 'INATIVO' ? ' (inativa)' : '' }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (form.controls.categoriaId.hasError('required')) {
+          <mat-error>Escolha a categoria</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="largo">
+        <mat-label>Descrição (opcional)</mat-label>
+        <textarea matInput formControlName="descricao" rows="2"></textarea>
+        <mat-hint>O texto que o cliente lê no cardápio</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Preço de venda (R$)</mat-label>
+        <input matInput type="number" formControlName="precoVenda" min="0.01" step="0.01" />
+        @if (form.controls.precoVenda.invalid) {
+          <mat-error>Informe um preço maior que zero</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tempo de preparo (minutos)</mat-label>
+        <input matInput type="number" formControlName="tempoPreparoMin" min="1" max="600" step="1" />
+        @if (form.controls.tempoPreparoMin.invalid) {
+          <mat-error>Informe de 1 a 600 minutos</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="INATIVO">Inativo (fora do cardápio)</mat-option>
+          <mat-option value="ATIVO" [disabled]="!podeAtivar()">Ativo (aparece no cardápio)</mat-option>
+          <mat-option value="PAUSADO">Pausado (fora do cardápio por enquanto)</mat-option>
+        </mat-select>
+        @if (!podeAtivar()) {
+          <mat-hint>Para ativar, o prato precisa de ficha técnica com ingredientes</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Foto: endereço da imagem (opcional)</mat-label>
+        <input matInput type="url" formControlName="fotoUrl" placeholder="https://..." autocomplete="off" />
+        @if (form.controls.fotoUrl.hasError('pattern')) {
+          <mat-error>O endereço deve começar com http:// ou https://</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Anime (opcional)</mat-label>
+        <input matInput formControlName="anime" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Personagem (opcional)</mat-label>
+        <input matInput formControlName="personagem" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="largo">
+        <mat-label>Modo de preparo (opcional)</mat-label>
+        <textarea matInput formControlName="modoPreparo" rows="6"></textarea>
+        <mat-hint>Passo a passo para a cozinha. O cliente não vê.</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : editando() ? 'Salvar alterações' : 'Criar prato' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharForm()">Cancelar</button>
+    </div>
+  </form>
+}
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Nome</span>
+    <input type="search" placeholder="Ex.: ramen" [value]="filtros().busca" (change)="filtrar('busca', $event)" />
+  </label>
+
+  <label>
+    <span>Categoria</span>
+    <select [value]="filtros().categoriaId" (change)="filtrar('categoriaId', $event)">
+      <option value="">Todas</option>
+      @for (categoria of categorias(); track categoria.id) {
+        <option [value]="categoria.id">{{ categoria.nome }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Status</span>
+    <select [value]="filtros().status" (change)="filtrar('status', $event)">
+      <option value="">Todos</option>
+      <option value="ATIVO">Ativos</option>
+      <option value="PAUSADO">Pausados</option>
+      <option value="INATIVO">Inativos</option>
+    </select>
+  </label>
+
+  <button mat-button type="button" (click)="limparFiltros()">Limpar filtros</button>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando os pratos...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar os pratos. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (pratos().length === 0) {
+  <p class="estado">Nenhum prato com estes filtros.</p>
+} @else {
+  <p class="contagem">{{ totalPratos() }} {{ totalPratos() === 1 ? 'prato' : 'pratos' }}</p>
+
+  <ul class="lista">
+    @for (prato of pratos(); track prato.id) {
+      <li class="linha" [class.inativo]="prato.status === 'INATIVO'">
+        <div class="dados">
+          <h2>{{ prato.nome }}</h2>
+          <p>{{ prato.categoriaNome }} · {{ prato.precoVenda | brl }} · {{ prato.tempoPreparoMin }} min</p>
+          @if (prato.anime) {
+            <p>{{ prato.anime }}{{ prato.personagem ? ' · ' + prato.personagem : '' }}</p>
+          }
+        </div>
+
+        <div class="etiquetas">
+          <span [class]="'etiqueta ' + prato.status.toLowerCase()">{{ nomeDoStatus(prato.status) }}</span>
+          @if (!prato.temFicha) {
+            <span class="etiqueta aviso">Sem ficha técnica</span>
+          }
+          @if (!prato.modoPreparo) {
+            <span class="etiqueta aviso">Sem modo de preparo</span>
+          }
+        </div>
+
+        <div class="botoes">
+          <button mat-stroked-button type="button" [disabled]="enviando()" (click)="editar(prato)">Editar</button>
+          @if (prato.status !== 'INATIVO') {
+            <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="desativar(prato)">
+              Desativar
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

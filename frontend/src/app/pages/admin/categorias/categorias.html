@@ -1,0 +1,92 @@
+<div class="cabecalho">
+  <h1>Categorias</h1>
+  @if (!formAberto()) {
+    <button mat-flat-button type="button" (click)="nova()">Nova categoria</button>
+  }
+</div>
+
+@if (formAberto()) {
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>{{ editando() ? 'Editar ' + editando()!.nome : 'Nova categoria' }}</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" autocomplete="off" />
+        @if (form.controls.nome.hasError('required')) {
+          <mat-error>Informe o nome</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Ordem no cardápio</mat-label>
+        <input matInput type="number" formControlName="ordem" min="0" max="999" />
+        <mat-hint>1 aparece primeiro</mat-hint>
+        @if (form.controls.ordem.invalid) {
+          <mat-error>Informe um número de 0 a 999</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="largo">
+        <mat-label>Descrição (opcional)</mat-label>
+        <input matInput formControlName="descricao" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="ATIVO">Ativa (aparece no cardápio)</mat-option>
+          <mat-option value="INATIVO">Inativa (fora do cardápio)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : editando() ? 'Salvar alterações' : 'Criar categoria' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharForm()">Cancelar</button>
+    </div>
+  </form>
+}
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando as categorias...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar as categorias. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (categorias().length === 0) {
+  <p class="estado">Nenhuma categoria ainda. Crie a primeira em "Nova categoria".</p>
+} @else {
+  <p class="contagem">{{ categorias().length }} {{ categorias().length === 1 ? 'categoria' : 'categorias' }}</p>
+
+  <ul class="lista">
+    @for (categoria of categorias(); track categoria.id) {
+      <li class="linha" [class.inativo]="categoria.status === 'INATIVO'">
+        <div class="dados">
+          <h2>{{ categoria.ordem }}. {{ categoria.nome }}</h2>
+          @if (categoria.descricao) {
+            <p>{{ categoria.descricao }}</p>
+          }
+        </div>
+
+        <div class="etiquetas">
+          <span [class]="'etiqueta ' + categoria.status.toLowerCase()">
+            {{ categoria.status === 'ATIVO' ? 'Ativa' : 'Inativa' }}
+          </span>
+        </div>
+
+        <div class="botoes">
+          <button mat-stroked-button type="button" [disabled]="enviando()" (click)="editar(categoria)">Editar</button>
+          @if (categoria.status === 'ATIVO') {
+            <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="desativar(categoria)">
+              Desativar
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+}

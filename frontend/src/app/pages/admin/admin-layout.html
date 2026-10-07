@@ -5,6 +5,10 @@
 
 <nav class="menu" aria-label="Seções do painel">
   <a routerLink="/admin/pedidos" routerLinkActive="ativo">Pedidos</a>
+  @if (gestao()) {
+    <a routerLink="/admin/pratos" routerLinkActive="ativo">Cardápio</a>
+    <a routerLink="/admin/categorias" routerLinkActive="ativo">Categorias</a>
+  }
   @if (admin()) {
     <a routerLink="/admin/usuarios" routerLinkActive="ativo">Usuários</a>
   }
