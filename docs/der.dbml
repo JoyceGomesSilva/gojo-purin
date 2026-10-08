@@ -1,0 +1,273 @@
+// Gojo Purin - DER em DBML. Cole em https://dbdiagram.io para editar ou exportar.
+// Gerado a partir das migrations Flyway V1 a V6.
+
+// ===== Clientes, equipe e pedidos =====
+Table usuario {
+  id bigint [pk]
+  nome varchar(120) [not null]
+  email varchar(160) [unique, not null]
+  senha_hash varchar(100) [not null]
+  perfil varchar(20) [not null]
+  telefone varchar(20)
+  endereco varchar(255)
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table pedido {
+  id bigint [pk]
+  cliente_id bigint [not null]
+  status varchar(20) [not null]
+  valor_total numeric(12,2) [not null]
+  endereco_entrega varchar(255) [not null]
+  observacoes varchar(500)
+  motivo_cancelamento varchar(255)
+  canal varchar(20) [not null]
+  pago boolean [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table pedido_item {
+  id bigint [pk]
+  pedido_id bigint [not null]
+  prato_id bigint [not null]
+  quantidade integer [not null]
+  preco_unitario numeric(10,2) [not null]
+  observacoes varchar(255)
+  preco_base numeric(10,2) [not null]
+  desconto_percentual numeric(5,2) [not null]
+  combo_id bigint
+  combo_nome varchar(120)
+  combo_chave varchar(40)
+}
+
+Table pedido_item_opcao {
+  id bigint [pk]
+  pedido_item_id bigint [not null]
+  opcao_id bigint [not null]
+  nome varchar(100) [not null]
+  preco_adicional numeric(10,2) [not null]
+}
+
+Table pedido_status_historico {
+  id bigint [pk]
+  pedido_id bigint [not null]
+  status varchar(20) [not null]
+  usuario_id bigint
+  created_at timestamp [not null]
+}
+
+// ===== Cardápio =====
+Table categoria {
+  id bigint [pk]
+  nome varchar(100) [not null]
+  descricao varchar(255)
+  ordem integer [not null]
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+}
+
+Table prato {
+  id bigint [pk]
+  categoria_id bigint [not null]
+  nome varchar(120) [not null]
+  descricao varchar(500)
+  foto_url varchar(500)
+  preco_venda numeric(10,2) [not null]
+  tempo_preparo_min integer [not null]
+  anime varchar(80)
+  personagem varchar(80)
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+}
+
+// ===== Combos e complementos =====
+Table combo {
+  id bigint [pk]
+  nome varchar(120) [not null]
+  descricao varchar(500)
+  tipo varchar(20) [not null]
+  desconto_percentual numeric(5,2) [not null]
+  foto_url varchar(500)
+  ordem integer [not null]
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+}
+
+Table combo_etapa {
+  id bigint [pk]
+  combo_id bigint [not null]
+  nome varchar(100) [not null]
+  obrigatoria boolean [not null]
+  ordem integer [not null]
+}
+
+Table combo_etapa_prato {
+  combo_etapa_id bigint [not null]
+  prato_id bigint [not null]
+  indexes {
+    (combo_etapa_id, prato_id) [pk]
+  }
+}
+
+Table grupo_opcao {
+  id bigint [pk]
+  nome varchar(100) [unique, not null]
+  obrigatorio boolean [not null]
+  min_escolhas integer [not null]
+  max_escolhas integer [not null]
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+}
+
+Table opcao {
+  id bigint [pk]
+  grupo_opcao_id bigint [not null]
+  nome varchar(100) [not null]
+  preco_adicional numeric(10,2) [not null]
+  ingrediente_id bigint
+  quantidade_ingrediente numeric(12,3)
+  ordem integer [not null]
+  status varchar(20) [not null]
+}
+
+Table prato_grupo_opcao {
+  id bigint [pk]
+  prato_id bigint [not null]
+  grupo_opcao_id bigint [not null]
+  ordem integer [not null]
+  indexes {
+    (prato_id, grupo_opcao_id) [unique]
+  }
+}
+
+// ===== Ficha técnica e estoque =====
+Table ficha_tecnica {
+  id bigint [pk]
+  prato_id bigint [unique, not null]
+  rendimento integer [not null]
+  modo_preparo text
+  created_at timestamp [not null]
+}
+
+Table ficha_tecnica_item {
+  id bigint [pk]
+  ficha_tecnica_id bigint [not null]
+  ingrediente_id bigint [not null]
+  quantidade numeric(12,3) [not null]
+  unidade varchar(5) [not null]
+  fator_correcao numeric(5,2) [not null]
+  indexes {
+    (ficha_tecnica_id, ingrediente_id) [unique]
+  }
+}
+
+Table ingrediente {
+  id bigint [pk]
+  nome varchar(120) [not null]
+  sku varchar(30) [unique, not null]
+  unidade_padrao varchar(5) [not null]
+  estoque_minimo numeric(12,3) [not null]
+  custo_unitario numeric(10,4) [not null]
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+}
+
+Table estoque_movimentacao {
+  id bigint [pk]
+  ingrediente_id bigint [not null]
+  tipo varchar(20) [not null]
+  quantidade numeric(12,3) [not null]
+  motivo varchar(20) [not null]
+  lote varchar(50)
+  validade date
+  custo_unitario numeric(10,4)
+  pedido_compra_id bigint
+  pedido_id bigint
+  usuario_id bigint [not null]
+  created_at timestamp [not null]
+}
+
+// ===== Fornecedores e compras =====
+Table fornecedor {
+  id bigint [pk]
+  razao_social varchar(160) [not null]
+  cnpj varchar(14) [unique, not null]
+  telefone varchar(20)
+  email varchar(160)
+  categorias_produtos varchar(255)
+  status varchar(20) [not null]
+  created_at timestamp [not null]
+}
+
+Table fornecedor_produto {
+  id bigint [pk]
+  fornecedor_id bigint [not null]
+  ingrediente_id bigint [not null]
+  preco numeric(10,4) [not null]
+  unidade_venda varchar(5) [not null]
+  indexes {
+    (fornecedor_id, ingrediente_id) [unique]
+  }
+}
+
+Table fornecedor_preco_historico {
+  id bigint [pk]
+  fornecedor_id bigint [not null]
+  ingrediente_id bigint [not null]
+  preco numeric(10,4) [not null]
+  created_at timestamp [not null]
+}
+
+Table pedido_compra {
+  id bigint [pk]
+  fornecedor_id bigint [not null]
+  status varchar(20) [not null]
+  valor_total numeric(12,2) [not null]
+  usuario_id bigint [not null]
+  created_at timestamp [not null]
+}
+
+Table pedido_compra_item {
+  id bigint [pk]
+  pedido_compra_id bigint [not null]
+  ingrediente_id bigint [not null]
+  quantidade numeric(12,3) [not null]
+  preco_unitario numeric(10,4) [not null]
+  subtotal numeric(12,2) [not null]
+}
+
+// ===== Relacionamentos (> = muitos para um, - = um para um) =====
+Ref: combo_etapa.combo_id > combo.id
+Ref: combo_etapa_prato.combo_etapa_id > combo_etapa.id
+Ref: combo_etapa_prato.prato_id > prato.id
+Ref: estoque_movimentacao.ingrediente_id > ingrediente.id
+Ref: estoque_movimentacao.pedido_compra_id > pedido_compra.id
+Ref: estoque_movimentacao.pedido_id > pedido.id
+Ref: estoque_movimentacao.usuario_id > usuario.id
+Ref: ficha_tecnica.prato_id - prato.id
+Ref: ficha_tecnica_item.ficha_tecnica_id > ficha_tecnica.id
+Ref: ficha_tecnica_item.ingrediente_id > ingrediente.id
+Ref: fornecedor_preco_historico.fornecedor_id > fornecedor.id
+Ref: fornecedor_preco_historico.ingrediente_id > ingrediente.id
+Ref: fornecedor_produto.fornecedor_id > fornecedor.id
+Ref: fornecedor_produto.ingrediente_id > ingrediente.id
+Ref: opcao.grupo_opcao_id > grupo_opcao.id
+Ref: opcao.ingrediente_id > ingrediente.id
+Ref: pedido.cliente_id > usuario.id
+Ref: pedido_compra.fornecedor_id > fornecedor.id
+Ref: pedido_compra.usuario_id > usuario.id
+Ref: pedido_compra_item.ingrediente_id > ingrediente.id
+Ref: pedido_compra_item.pedido_compra_id > pedido_compra.id
+Ref: pedido_item.combo_id > combo.id
+Ref: pedido_item.pedido_id > pedido.id
+Ref: pedido_item.prato_id > prato.id
+Ref: pedido_item_opcao.opcao_id > opcao.id
+Ref: pedido_item_opcao.pedido_item_id > pedido_item.id
+Ref: pedido_status_historico.pedido_id > pedido.id
+Ref: pedido_status_historico.usuario_id > usuario.id
+Ref: prato.categoria_id > categoria.id
+Ref: prato_grupo_opcao.grupo_opcao_id > grupo_opcao.id
+Ref: prato_grupo_opcao.prato_id > prato.id
