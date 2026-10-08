@@ -1,13 +1,20 @@
-// A faixa do topo: azul pastel, com a borda de baixo escorrida como calda.
+// O site ocupa pelo menos a altura da tela, para o rodape ficar sempre embaixo.
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// A faixa do topo: calda de caramelo, com a borda de baixo escorrendo.
 .topo {
   position: sticky;
   top: 0;
   z-index: 10;
-  color: var(--gp-tinta);
+  color: var(--gp-fundo);
 
-  // Na faixa, os botoes de texto do Material usam a cor do texto.
+  // Na faixa escura, os botoes de texto do Material ficam claros.
   .mat-mdc-button:not(:disabled) {
-    color: var(--gp-tinta);
+    color: var(--gp-fundo);
   }
 }
 
@@ -17,14 +24,14 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 32px;
-  background: var(--gp-azul);
+  background: var(--gp-calda);
 }
 
 .marca {
-  font-family: var(--gp-fonte-titulo);
-  font-size: 1.6rem;
+  font-family: var(--gp-fonte-marca);
+  font-size: 2.2rem;
   line-height: 1;
-  color: var(--gp-tinta);
+  color: var(--gp-fundo);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -40,15 +47,44 @@
   font-weight: 700;
 }
 
+// Carrinho: so o icone, claro sobre a calda, com o contador de itens no canto.
 .carrinho {
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--gp-papel);
-  color: var(--gp-rosa-forte);
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  color: var(--gp-fundo);
   text-decoration: none;
-  white-space: nowrap;
+  transition: transform 120ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.icone-carrinho {
+  width: 28px;
+  height: 28px;
+  fill: currentColor; // o icone usa a cor do texto (caramelo)
+}
+
+.contador {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--gp-shu);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--gp-calda);
 }
 
 .calda {
@@ -56,15 +92,58 @@
   width: 100%;
   height: 24px;
   margin-top: -1px;
-  fill: var(--gp-azul);
+  fill: var(--gp-calda);
   // A borda nao pode bloquear cliques no que esta por baixo.
   pointer-events: none;
 }
 
 .conteudo {
+  flex: 1;
+  width: 100%;
   max-width: 1160px;
   margin: 0 auto;
   padding: 24px 32px 96px;
+}
+
+// Rodape: a mesma calda do topo, agora "subindo" do fim da pagina.
+.rodape-site {
+  color: var(--gp-fundo);
+
+  .calda {
+    transform: scaleY(-1); // a mesma onda do topo, de cabeca para baixo
+    margin: 0 0 -1px;
+  }
+}
+
+.rodape-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 32px;
+  padding: 20px 32px 32px;
+  background: var(--gp-calda);
+
+  p {
+    margin: 0;
+  }
+}
+
+.rodape-marca {
+  font-family: var(--gp-fonte-marca);
+  font-size: 1.6rem;
+
+  span {
+    margin-right: 10px;
+    font-family: 'Shippori Mincho B1', serif;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+}
+
+.rodape-nota {
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 .so-estreito {
@@ -91,7 +170,7 @@
   }
 
   .carrinho {
-    padding: 6px 12px;
+    width: 40px;
   }
 
   // No celular somem a saudacao e o "Criar conta" (a tela de login leva ao cadastro).
@@ -105,10 +184,14 @@
   }
 
   .marca {
-    font-size: 1.25rem;
+    font-size: 1.6rem;
   }
 
   .conteudo {
     padding: 16px 16px 72px;
+  }
+
+  .rodape-linha {
+    padding: 16px 16px 24px;
   }
 }

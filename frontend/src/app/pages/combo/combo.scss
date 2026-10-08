@@ -44,26 +44,14 @@
   align-items: start;
 }
 
-// Cada etapa e um cartao separado, com um pastel diferente na faixa do titulo.
+// Cada etapa e um cartao separado, com a faixa do titulo em creme de pudim.
 .etapa {
-  --cor: var(--gp-azul);
+  --cor: var(--gp-creme);
   margin-bottom: 40px;
   padding: 28px;
   background: var(--gp-papel);
   border: 2px solid var(--gp-linha);
   border-radius: 24px;
-
-  &:nth-of-type(4n + 2) {
-    --cor: var(--gp-rosa);
-  }
-
-  &:nth-of-type(4n + 3) {
-    --cor: var(--gp-amarelo);
-  }
-
-  &:nth-of-type(4n + 4) {
-    --cor: var(--gp-menta);
-  }
 
   &:last-child {
     margin-bottom: 0;
@@ -164,7 +152,7 @@
   background: var(--gp-papel);
   border: 2px solid var(--gp-linha);
   border-radius: 24px;
-  box-shadow: 8px 8px 0 var(--gp-amarelo);
+  box-shadow: 8px 8px 0 var(--gp-creme);
 
   h2 {
     font-family: var(--gp-fonte-titulo);

@@ -17,7 +17,7 @@ interface Secao {
   selector: 'app-inicio',
   imports: [RouterLink, MatButtonModule, BrlPipe],
   templateUrl: './inicio.html',
-  styleUrl: './inicio.scss'
+  styleUrls: ['./inicio.scss', './abertura.scss']
 })
 export class Inicio {
   private cardapio = inject(CardapioService);
@@ -46,6 +46,10 @@ export class Inicio {
     }
     return secoes;
   });
+
+  // ----- Abertura (o topo da pagina) -----
+  // O maior desconto entre os combos, para o destaque "ate X% off".
+  protected maiorDesconto = computed(() => Math.max(0, ...this.combos().map((combo) => combo.descontoPercentual)));
 
   constructor() {
     this.cardapio.categorias().subscribe({

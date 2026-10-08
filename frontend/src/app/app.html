@@ -3,11 +3,22 @@
     <a class="marca" routerLink="/">Gojo Purin</a>
 
     <nav class="acoes" aria-label="Conta">
-      <a class="carrinho" routerLink="/carrinho">
+      <!-- Carrinho como icone. O numerozinho mostra quantos itens ha nele.
+           O aria-label diz o mesmo para quem usa leitor de tela. -->
+      <a
+        class="carrinho"
+        routerLink="/carrinho"
+        [attr.aria-label]="
+          carrinho.quantidadeTotal() > 0 ? 'Carrinho, ' + carrinho.quantidadeTotal() + ' itens' : 'Carrinho'
+        "
+      >
+        <svg class="icone-carrinho" viewBox="0 -960 960 960" aria-hidden="true">
+          <path
+            d="M223.5-103.5Q200-127 200-160t23.5-56.5Q247-240 280-240t56.5 23.5Q360-193 360-160t-23.5 56.5Q313-80 280-80t-56.5-23.5Zm400 0Q600-127 600-160t23.5-56.5Q647-240 680-240t56.5 23.5Q760-193 760-160t-23.5 56.5Q713-80 680-80t-56.5-23.5ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"
+          />
+        </svg>
         @if (carrinho.quantidadeTotal() > 0) {
-          Carrinho: {{ carrinho.quantidadeTotal() }}
-        } @else {
-          Carrinho
+          <span class="contador" aria-hidden="true">{{ carrinho.quantidadeTotal() }}</span>
         }
       </a>
 
@@ -40,3 +51,16 @@
 <main class="conteudo">
   <router-outlet />
 </main>
+
+<footer class="rodape-site">
+  <svg class="calda" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true">
+      <path
+        d="M0 0h1200v10c-30 0-34 22-60 22s-28-18-58-18-34 26-66 26-30-24-62-24-36 14-70 14-34-20-66-20-30 28-62 28-34-22-66-22-36 12-68 12-32-18-64-18-30 30-62 30-34-26-66-26-36 16-68 16-32-22-64-22-30 24-62 24-34-18-66-18-38 14-70 14-34-20-50-20-26 16-50 16V0z"
+      />
+    </svg>
+  <div class="rodape-linha">
+    <p class="rodape-marca"><span lang="ja">五条プリン</span>Gojo Purin</p>
+    <p>Do episódio para a sua mesa.</p>
+    <p class="rodape-nota">Projeto acadêmico de Desenvolvimento Full-Stack · UNASP · 2026</p>
+  </div>
+</footer>

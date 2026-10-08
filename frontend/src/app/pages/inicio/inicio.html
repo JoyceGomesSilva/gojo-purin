@@ -1,6 +1,29 @@
+<!-- Abertura: titulo, slogan e vantagens, com o letreiro decorativo a direita. -->
 <section class="abertura">
-  <h1>Aquele prato do anime, agora na sua porta.</h1>
-  <p>Cozinha só de delivery. Você pede pelo site e acompanha o preparo até sair para entrega.</p>
+  <div class="abertura-texto">
+    <p class="sobretitulo"><span lang="ja">五条プリン</span> · cozinha de anime</p>
+    <h1>Aquele prato do anime, agora na sua porta.</h1>
+    <p class="chamada">
+      Do episódio para a sua mesa: as receitas que você só via na tela, feitas de verdade e entregues quentinhas.
+    </p>
+
+    <!-- Tres vantagens, cada uma com um ideograma em selo pequeno. -->
+    <ul class="vantagens">
+      <li><span class="mini-selo" aria-hidden="true">配</span>Só delivery</li>
+      <li><span class="mini-selo" aria-hidden="true">時</span>Acompanhe o preparo ao vivo</li>
+      @if (maiorDesconto() > 0) {
+        <li><span class="mini-selo" aria-hidden="true">割</span>Combos com até {{ maiorDesconto() }}% de desconto</li>
+      }
+    </ul>
+  </div>
+
+  <!-- Letreiro vertical, como a placa de madeira na porta dos restaurantes
+       japoneses. E so decoracao: fica por cima do espaco vazio a direita,
+       sem empurrar o texto, e some em telas estreitas. -->
+  <div class="letreiro" aria-hidden="true">
+    <span class="vertical">五条プリン</span>
+    <span class="selo-placa">食</span>
+  </div>
 </section>
 
 <nav class="filtros" aria-label="Filtrar por categoria">
@@ -62,12 +85,14 @@
       @for (prato of secao.pratos; track prato.id) {
         <li>
           <a class="prato" [routerLink]="['/prato', prato.id]">
-            <div class="foto">
+            <div class="foto" [class.sem-foto]="!prato.fotoUrl">
               @if (prato.fotoUrl) {
                 <img [src]="prato.fotoUrl" alt="" loading="lazy" />
               } @else {
-                <span aria-hidden="true">{{ secao.kanji }}</span>
+                <span class="kanji-grande" aria-hidden="true">{{ secao.kanji }}</span>
               }
+              <!-- O selo da categoria fica no canto, com ou sem foto. -->
+              <span class="hanko" aria-hidden="true">{{ secao.kanji }}</span>
             </div>
 
             <div class="texto">

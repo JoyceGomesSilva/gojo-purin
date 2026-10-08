@@ -1,5 +1,8 @@
 // ===================================================================
-// Identidade visual do Gojo Purin (tons pastel)
+// Identidade visual do Gojo Purin: "purin" (pudim) e cores tradicionais
+// japonesas. Fundo de papel washi, calda de caramelo, creme de pudim e o
+// vermelho dos portoes torii so nas acoes. Os pasteis ficam para detalhes
+// pequenos, para nao brigar com as fotos da comida.
 // Este bloco fica NO FINAL do arquivo frontend/src/styles.scss
 // ===================================================================
 
@@ -18,23 +21,34 @@ html {
 
 body {
   // Fundo e texto
-  --gp-fundo: #ffeaf2;       // rosa pastel;       
-  --gp-papel: #ffffff;       // cartoes
-  --gp-tinta: #3a3558;       // texto: um anil suave, no lugar do preto
-  --gp-tinta-suave: #6d6890; // textos secundarios
-  --gp-linha: #e7def3;       // contornos e divisorias
+  --gp-fundo: #f4ead8;        // kinari: papel washi cru
+  --gp-fundo-escuro: #eadcc2; // washi mais tostado (fundo da foto sem imagem)
+  --gp-papel: #fffcf6;        // cartoes
+  --gp-tinta: #2b2420;        // sumi: tinta nanquim, no lugar do preto
+  --gp-tinta-suave: #6e625a;  // textos secundarios
+  --gp-linha: #e2d3b8;        // contornos e divisorias
 
-  // Os quatro pasteis. Cada secao do cardapio usa um deles.
-  --gp-azul: #c3e4ff;
-  --gp-rosa: #ffd3e3;
-  --gp-amarelo: #ffeeb3;
-  --gp-menta: #cdf3df;
+  // A marca: o pudim com calda
+  --gp-calda: #7a3f1d;        // calda de caramelo (topo do site)
+  --gp-calda-clara: #9a4a1a;  // links e destaques em texto
+  --gp-creme: #fbe7a8;        // creme de pudim (destaques e sombras dos cartoes)
+  --gp-shu: #bb3923;          // shu: o vermelho dos portoes torii (botoes e selos)
 
-  // Cores de acao (mais fortes, para dar leitura em botoes e etiquetas)
-  --gp-primaria: #4a78d6;
-  --gp-rosa-forte: #c2457a;
+  // Pasteis para detalhes pequenos (etiquetas e avisos)
+  --gp-azul: #dbe6ec;         // sora: ceu
+  --gp-rosa: #f6d6dc;         // sakura
+  --gp-amarelo: #fbe7a8;      // o mesmo creme de pudim
+  --gp-menta: #d5e9d6;        // matcha
+
+  // Cores de acao
+  --gp-primaria: var(--gp-shu);
+  --gp-rosa-forte: #a8324a;   // beni: avisos e cancelamentos
 
   --gp-fonte-titulo: 'Dela Gothic One', 'Zen Maru Gothic', sans-serif;
+  // A fonte do nome "Gojo Purin" no topo e no rodape. Para trocar, use uma
+  // destas: 'Yuji Boku' (pincel), 'Reggae One' (manga), 'Rampart One'
+  // (contorno) ou 'Dela Gothic One' (a dos titulos).
+  --gp-fonte-marca: 'Reggae One', 'Dela Gothic One', sans-serif;
   --gp-fonte-texto: 'Zen Maru Gothic', system-ui, sans-serif;
 
   // Faz os componentes do Angular Material usarem as mesmas cores e fonte.
@@ -67,7 +81,10 @@ body {
   --mat-sys-corner-full: 999px;
 
   margin: 0;
-  background: var(--gp-fundo);
+  background-color: var(--gp-fundo);
+  // Textura de papel: um "ruido" bem fraquinho, cor de caramelo, repetido por
+  // toda a pagina. Da a sensacao de papel washi sem pesar (e um SVG pequeno).
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.48 0 0 0 0 0.25 0 0 0 0 0.11 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   color: var(--gp-tinta);
   font-family: var(--gp-fonte-texto);
   font-weight: 500;
@@ -75,7 +92,7 @@ body {
 }
 
 a {
-  color: var(--gp-primaria);
+  color: var(--gp-calda-clara);
 }
 
 // Contorno bem visivel para quem navega pelo teclado.
@@ -89,4 +106,37 @@ a {
 button.mat-mdc-button-base,
 a.mat-mdc-button-base {
   border-radius: 999px;
+}
+
+// Selo hanko: o carimbo vermelho que os japoneses usam como assinatura.
+// Aqui ele leva o ideograma da categoria e fica no canto da foto do prato
+// (e no lugar dela, enquanto o prato nao tem foto).
+// Uso: <span class="hanko" aria-hidden="true">主</span> dentro de um bloco
+// com position: relative.
+.hanko {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background: var(--gp-shu);
+  color: #ffffff;
+  font-family: 'Shippori Mincho B1', 'Dela Gothic One', serif;
+  font-weight: 800;
+  font-size: 1.45rem;
+  line-height: 1;
+  // Um contorno claro separa o selo de qualquer foto, clara ou escura.
+  box-shadow: 0 0 0 2px var(--gp-papel);
+  transform: rotate(-4deg);
+}
+
+// Fundo da foto enquanto o prato nao tem imagem: papel washi com a
+// reticula de pontinhos dos mangas.
+.sem-foto {
+  background-color: var(--gp-fundo-escuro);
+  background-image: radial-gradient(rgba(122, 63, 29, 0.14) 1.2px, transparent 1.6px);
+  background-size: 12px 12px;
 }

@@ -10,12 +10,13 @@
 } @else {
   @if (prato(); as p) {
     <article class="detalhe">
-      <div class="foto">
+      <div class="foto" [class.sem-foto]="!p.fotoUrl">
         @if (p.fotoUrl) {
           <img [src]="p.fotoUrl" [alt]="p.nome" />
         } @else {
-          <span aria-hidden="true">{{ kanji() }}</span>
+          <span class="kanji-grande" aria-hidden="true">{{ kanji() }}</span>
         }
+        <span class="hanko" aria-hidden="true">{{ kanji() }}</span>
       </div>
 
       <div class="info">

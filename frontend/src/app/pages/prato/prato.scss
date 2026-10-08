@@ -12,12 +12,12 @@
 }
 
 .foto {
+  position: relative; // o selo hanko se posiciona em relacao a foto
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  background: var(--gp-azul);
   border-radius: 32px;
-  box-shadow: 12px 12px 0 var(--gp-rosa);
+  box-shadow: 12px 12px 0 var(--gp-creme);
   overflow: hidden;
 
   img {
@@ -26,12 +26,23 @@
     object-fit: cover;
   }
 
-  span {
-    font-family: var(--gp-fonte-titulo);
+  // Sem foto: o ideograma grande, cor de calda, sobre o papel com reticula.
+  .kanji-grande {
+    font-family: 'Shippori Mincho B1', 'Dela Gothic One', serif;
+    font-weight: 800;
     font-size: clamp(7rem, 22vw, 13rem);
     line-height: 1;
-    color: var(--gp-tinta);
-    opacity: 0.4;
+    color: var(--gp-calda);
+    opacity: 0.3;
+  }
+
+  // Na foto grande, o selo tambem fica maior.
+  .hanko {
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
   }
 }
 
@@ -54,7 +65,7 @@ h1 {
 .origem {
   margin: 0 0 24px;
   font-weight: 700;
-  color: var(--gp-rosa-forte);
+  color: var(--gp-calda-clara);
 }
 
 .descricao {
@@ -113,7 +124,7 @@ h1 {
     height: 44px;
     border: 0;
     border-radius: 999px;
-    background: var(--gp-azul);
+    background: var(--gp-creme);
     font: inherit;
     font-size: 1.4rem;
     font-weight: 700;
@@ -160,6 +171,6 @@ h1 {
 
   .foto {
     aspect-ratio: 4 / 3;
-    box-shadow: 8px 8px 0 var(--gp-rosa);
+    box-shadow: 8px 8px 0 var(--gp-creme);
   }
 }

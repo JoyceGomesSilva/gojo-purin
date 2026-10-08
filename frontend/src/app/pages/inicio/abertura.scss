@@ -1,0 +1,142 @@
+// Estilos da abertura (o topo da pagina inicial). Ficam separados do
+// inicio.scss para cada arquivo continuar pequeno.
+
+// O texto ocupa a mesma largura de antes. O letreiro fica posicionado por
+// cima do espaco livre a direita, entao nao tira espaco das palavras.
+.abertura {
+  position: relative;
+  padding: 32px 0 40px;
+
+  h1 {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+    font-size: clamp(2rem, 5.5vw, 3.25rem);
+    line-height: 1.15;
+    margin: 0 0 20px;
+    color: var(--gp-tinta);
+    text-wrap: balance;
+  }
+}
+
+.abertura-texto {
+  max-width: 46rem;
+}
+
+// "五条プリン · cozinha de anime", em cima do titulo.
+.sobretitulo {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--gp-creme);
+  color: var(--gp-calda);
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  span {
+    font-family: 'Shippori Mincho B1', serif;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+}
+
+.chamada {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  margin: 0 0 28px;
+  max-width: 34rem;
+  color: var(--gp-tinta-suave);
+}
+
+.vantagens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--gp-tinta);
+  }
+}
+
+// Um selo hanko pequenininho ao lado de cada vantagem.
+.mini-selo {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  background: var(--gp-calda);
+  color: var(--gp-fundo);
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  transform: rotate(-4deg);
+}
+
+// Letreiro vertical: "Gojo Purin" em japones, escrito de cima para baixo,
+// numa plaquinha de papel com moldura fina e o selo 食 ("comida").
+.letreiro {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  padding: 30px 28px 36px;
+  background: var(--gp-papel);
+  border: 1px solid var(--gp-linha);
+  border-radius: 6px;
+  box-shadow: 10px 10px 0 var(--gp-creme);
+
+  // A moldura fina por dentro da placa.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border: 1px solid var(--gp-calda);
+    border-radius: 3px;
+    opacity: 0.35;
+  }
+}
+
+.vertical {
+  display: block;
+  writing-mode: vertical-rl; // escrita vertical, como no japones tradicional
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 2.9rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--gp-calda);
+}
+
+.selo-placa {
+  position: absolute;
+  right: -14px;
+  bottom: -12px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 5px;
+  background: var(--gp-shu);
+  color: #ffffff;
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  transform: rotate(-5deg);
+  box-shadow: 0 0 0 2px var(--gp-fundo);
+}
+
+// Sem espaco livre ao lado do texto, o letreiro sai de cena.
+@media (max-width: 1000px) {
+  .letreiro {
+    display: none;
+  }
+}

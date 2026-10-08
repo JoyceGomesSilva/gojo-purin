@@ -1,26 +1,3 @@
-.abertura {
-  padding: 40px 0 32px;
-  max-width: 46rem;
-
-  h1 {
-    font-family: var(--gp-fonte-titulo);
-    font-weight: 400;
-    font-size: clamp(2rem, 5.5vw, 3.25rem);
-    line-height: 1.15;
-    margin: 0 0 20px;
-    color: var(--gp-tinta);
-    text-wrap: balance;
-  }
-
-  p {
-    font-size: 1.15rem;
-    line-height: 1.65;
-    margin: 0;
-    max-width: 34rem;
-    color: var(--gp-tinta-suave);
-  }
-}
-
 // Filtros: uma fileira que rola para o lado no celular.
 .filtros {
   display: flex;
@@ -42,8 +19,8 @@
   cursor: pointer;
 
   &:hover {
-    background: var(--gp-azul);
-    border-color: var(--gp-azul);
+    background: var(--gp-creme);
+    border-color: var(--gp-creme);
   }
 
   &.ativo {
@@ -53,23 +30,11 @@
   }
 }
 
-// Cada secao do cardapio recebe um dos quatro pasteis, em rodizio.
-// A variavel --cor pinta o fundo da foto e a sombra dos cartoes daquela secao.
+// Todas as secoes usam o creme de pudim na sombra dos cartoes: uma cor so,
+// para a comida (as fotos) ser o que mais chama atencao.
 .secao {
-  --cor: var(--gp-azul);
+  --cor: var(--gp-creme);
   margin-top: 64px;
-
-  &:nth-of-type(4n + 2) {
-    --cor: var(--gp-rosa);
-  }
-
-  &:nth-of-type(4n + 3) {
-    --cor: var(--gp-amarelo);
-  }
-
-  &:nth-of-type(4n + 4) {
-    --cor: var(--gp-menta);
-  }
 
   h2 {
     display: flex;
@@ -81,18 +46,30 @@
     line-height: 1.2;
     margin: 0 0 28px;
     color: var(--gp-tinta);
+
+    // Um fio fino ate o fim da linha, como nos cardapios impressos.
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gp-linha);
+    }
   }
 
-  // O ideograma fica dentro de uma bolinha na cor da secao.
+  // O ideograma do titulo vira um selo hanko, como o das fotos.
   .kanji {
     display: grid;
     place-items: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--cor);
+    width: 52px;
+    height: 52px;
+    border-radius: 6px;
+    background: var(--gp-shu);
+    color: #ffffff;
+    font-family: 'Shippori Mincho B1', 'Dela Gothic One', serif;
+    font-weight: 800;
     font-size: 1.6rem;
     line-height: 1;
+    transform: rotate(-4deg);
   }
 }
 
@@ -126,10 +103,10 @@
 }
 
 .foto {
+  position: relative; // o selo hanko se posiciona em relacao a foto
   aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
-  background: var(--cor);
 
   img {
     width: 100%;
@@ -137,12 +114,14 @@
     object-fit: cover;
   }
 
-  span {
-    font-family: var(--gp-fonte-titulo);
+  // Sem foto: o ideograma grande, cor de calda, sobre o papel com reticula.
+  .kanji-grande {
+    font-family: 'Shippori Mincho B1', 'Dela Gothic One', serif;
+    font-weight: 800;
     font-size: 5rem;
     line-height: 1;
-    color: var(--gp-tinta);
-    opacity: 0.45;
+    color: var(--gp-calda);
+    opacity: 0.35;
   }
 }
 
@@ -163,7 +142,7 @@
   margin: 0 0 12px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--gp-rosa-forte);
+  color: var(--gp-calda-clara);
 }
 
 .descricao {
@@ -195,7 +174,7 @@
   color: var(--gp-tinta-suave);
 }
 
-// Combos: cartoes mais largos, com fundo pastel, para se destacarem dos pratos.
+// Combos: cartoes mais largos, cor de creme de pudim, para se destacarem dos pratos.
 .combos {
   list-style: none;
   margin: 0;
@@ -212,7 +191,7 @@
   padding: 28px;
   color: var(--gp-tinta);
   text-decoration: none;
-  background: var(--gp-azul);
+  background: var(--gp-creme);
   border-radius: 24px;
   transition: transform 120ms ease;
 
@@ -240,14 +219,14 @@
     border-radius: 999px;
     font-size: 0.82rem;
     font-weight: 700;
-    background: var(--gp-papel);
-    color: var(--gp-rosa-forte);
+    background: var(--gp-shu);
+    color: #ffffff;
   }
 
   .itens {
     margin: 20px 0 0;
     padding-top: 16px;
-    border-top: 2px dashed rgba(58, 53, 88, 0.2);
+    border-top: 2px dashed rgba(43, 36, 32, 0.2);
     font-size: 0.9rem;
     font-weight: 700;
     line-height: 1.6;
@@ -269,19 +248,8 @@
   }
 }
 
-// Cada combo pega um pastel diferente; o "monte o seu" fica branco com contorno.
-.combos li:nth-child(4n + 2) .combo {
-  background: var(--gp-rosa);
-}
-
-.combos li:nth-child(4n + 3) .combo {
-  background: var(--gp-amarelo);
-}
-
-.combos li:nth-child(4n + 4) .combo {
-  background: var(--gp-menta);
-}
-
+// O "monte o seu" fica em papel claro com contorno tracejado, para mostrar
+// que ainda esta "em aberto".
 .combos li .combo.montavel {
   background: var(--gp-papel);
   border: 2px dashed var(--gp-primaria);
