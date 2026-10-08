@@ -442,3 +442,115 @@ export interface FiltrosDeMovimentacao {
   ingredienteId: string;
   tipo: string;
 }
+
+// ---------- Painel: fornecedores e compras ----------
+
+// Fornecedor como vem de /api/admin/fornecedores (FornecedorResponse no back).
+// O CNPJ vem so com os 14 caracteres; a tela coloca a pontuacao.
+export interface Fornecedor {
+  id: number;
+  razaoSocial: string;
+  cnpj: string;
+  telefone: string | null;
+  email: string | null;
+  categoriasProdutos: string | null;
+  status: 'ATIVO' | 'INATIVO';
+}
+
+export interface FornecedorRequest {
+  razaoSocial: string;
+  cnpj: string;
+  telefone: string | null;
+  email: string | null;
+  categoriasProdutos: string | null;
+  status: 'ATIVO' | 'INATIVO';
+}
+
+// Filtros da lista de fornecedores. Texto vazio = sem filtro.
+export interface FiltrosDeFornecedor {
+  status: string;
+  busca: string;
+}
+
+// Uma linha do catalogo: "este fornecedor vende este ingrediente por este preco".
+export interface CatalogoItem {
+  id: number;
+  ingredienteId: number;
+  ingredienteNome: string;
+  unidade: string;
+  preco: number;
+  custoAtual: number;
+}
+
+export interface CatalogoItemRequest {
+  ingredienteId: number;
+  preco: number;
+}
+
+// Um fornecedor na cotacao comparativa.
+export interface CotacaoOferta {
+  fornecedorId: number;
+  razaoSocial: string;
+  telefone: string | null;
+  email: string | null;
+  preco: number;
+  maisBarato: boolean;
+  diferencaPercentual: number;
+}
+
+// Um ponto do historico de precos.
+export interface PrecoHistorico {
+  fornecedorId: number;
+  razaoSocial: string;
+  preco: number;
+  dataHora: string;
+}
+
+export interface Cotacao {
+  ingredienteId: number;
+  ingredienteNome: string;
+  unidade: string;
+  custoAtual: number;
+  ofertas: CotacaoOferta[];
+  historico: PrecoHistorico[];
+}
+
+export type StatusCompra = 'RASCUNHO' | 'ENVIADO' | 'RECEBIDO' | 'CANCELADO';
+
+export interface CompraItem {
+  id: number;
+  ingredienteId: number;
+  ingredienteNome: string;
+  unidade: string;
+  quantidade: number;
+  precoUnitario: number;
+  subtotal: number;
+}
+
+// Pedido de compra como vem de /api/admin/compras (CompraResponse no back).
+export interface Compra {
+  id: number;
+  fornecedorId: number;
+  fornecedorNome: string;
+  status: StatusCompra;
+  valorTotal: number;
+  criadoEm: string;
+  itens: CompraItem[];
+}
+
+// O que o front envia para criar ou editar. Nao vai preco: o back usa o do catalogo.
+export interface CompraRequest {
+  fornecedorId: number;
+  itens: { ingredienteId: number; quantidade: number }[];
+}
+
+// Lote e validade de cada item na hora do recebimento (opcionais).
+export interface RecebimentoRequest {
+  itens: { itemId: number; lote: string | null; validade: string | null }[];
+}
+
+// Filtros da lista de compras. Texto vazio = sem filtro.
+export interface FiltrosDeCompra {
+  status: string;
+  fornecedorId: string;
+}

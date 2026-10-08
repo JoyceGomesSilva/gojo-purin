@@ -1,0 +1,84 @@
+<a class="voltar" routerLink="/admin/fornecedores">← Voltar para os fornecedores</a>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando o catálogo...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar o catálogo. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (fornecedor(); as fornecedor) {
+  <div class="cabecalho">
+    <div>
+      <h1>Catálogo: {{ fornecedor.razaoSocial }}</h1>
+      <p class="contagem">CNPJ {{ formatarCnpj(fornecedor.cnpj) }}</p>
+    </div>
+    <div class="atalhos">
+      <a mat-flat-button routerLink="/admin/compras/nova" [queryParams]="{ fornecedor: fornecedor.id }">
+        Novo pedido de compra
+      </a>
+    </div>
+  </div>
+
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>Adicionar ingrediente ou mudar preço</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Ingrediente</mat-label>
+        <mat-select formControlName="ingredienteId" (selectionChange)="escolherIngrediente($event.value)">
+          @for (ingrediente of ingredientes(); track ingrediente.id) {
+            <mat-option [value]="ingrediente.id">{{ ingrediente.nome }}</mat-option>
+          }
+        </mat-select>
+        @if (ingredienteEscolhido(); as escolhido) {
+          <mat-hint>Custo atual: {{ formatarCustoUnitario(escolhido.custoUnitario, escolhido.unidadePadrao) }}</mat-hint>
+        }
+        @if (form.controls.ingredienteId.hasError('required')) {
+          <mat-error>Escolha o ingrediente</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Preço deste fornecedor (R$)</mat-label>
+        <input matInput type="number" formControlName="preco" min="0" step="any" />
+        <span matTextSuffix>{{ unidadeEscolhida() ? 'por ' + unidadeEscolhida() : '' }}</span>
+        <mat-hint>Preço de 1 unidade (1 g, 1 ml, 1 un...)</mat-hint>
+        @if (form.controls.preco.invalid) {
+          <mat-error>Informe um preço maior que zero</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : 'Salvar no catálogo' }}
+      </button>
+    </div>
+  </form>
+
+  @if (itens().length === 0) {
+    <p class="estado">Este fornecedor ainda não tem ingredientes no catálogo.</p>
+  } @else {
+    <p class="contagem">{{ itens().length }} {{ itens().length === 1 ? 'ingrediente' : 'ingredientes' }}</p>
+
+    <ul class="lista">
+      @for (item of itens(); track item.id) {
+        <li class="linha">
+          <div class="dados">
+            <h2>{{ item.ingredienteNome }}</h2>
+            <p>
+              Preço: <strong>{{ formatarCustoUnitario(item.preco, item.unidade) }}</strong> · Custo atual no sistema:
+              {{ formatarCustoUnitario(item.custoAtual, item.unidade) }}
+            </p>
+          </div>
+
+          <div class="botoes">
+            <button mat-stroked-button type="button" (click)="alterarPreco(item)">Alterar preço</button>
+            <a mat-button routerLink="/admin/cotacao" [queryParams]="{ ingrediente: item.ingredienteId }">Cotação</a>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+}

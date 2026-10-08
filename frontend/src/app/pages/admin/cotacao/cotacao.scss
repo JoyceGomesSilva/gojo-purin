@@ -1,0 +1,40 @@
+// Numero da posicao na cotacao (1o, 2o...).
+.posicao {
+  flex: none;
+  font-family: var(--gp-fonte-titulo);
+  font-size: 1.4rem;
+  color: var(--gp-tinta-suave);
+}
+
+// O mais barato ganha borda verde.
+.linha.melhor {
+  border-color: #6cc39a;
+}
+
+.grafico-caixa {
+  margin-top: 40px;
+  padding: 28px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  h2 {
+    margin-bottom: 4px;
+  }
+}
+
+// O Chart.js ocupa o tamanho da caixa em volta do canvas.
+.grafico {
+  position: relative;
+  height: 300px;
+}
+
+@media (max-width: 640px) {
+  .grafico-caixa {
+    padding: 20px;
+  }
+
+  .grafico {
+    height: 240px;
+  }
+}

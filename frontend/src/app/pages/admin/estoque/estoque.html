@@ -6,6 +6,7 @@
     }
     <a mat-stroked-button routerLink="/admin/estoque/movimentacoes">Ver movimentações</a>
     <a mat-stroked-button routerLink="/admin/ingredientes">Ingredientes</a>
+    <a mat-stroked-button routerLink="/admin/cotacao">Cotação</a>
   </div>
 </div>
 
@@ -168,7 +169,8 @@
         @for (alerta of alertas(); track alerta.ingredienteId) {
           <li>
             <strong>{{ alerta.nome }}</strong>: há {{ formatarQuantidade(alerta.saldo, alerta.unidade) }}, o mínimo
-            é {{ formatarQuantidade(alerta.estoqueMinimo, alerta.unidade) }}
+            é {{ formatarQuantidade(alerta.estoqueMinimo, alerta.unidade) }} ·
+            <a routerLink="/admin/cotacao" [queryParams]="{ ingrediente: alerta.ingredienteId }">ver cotação</a>
           </li>
         }
       </ul>

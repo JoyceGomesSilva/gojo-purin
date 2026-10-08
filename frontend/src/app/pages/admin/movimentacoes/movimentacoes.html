@@ -55,7 +55,10 @@
             </p>
           }
           @if (movimentacao.pedidoCompraId) {
-            <p>Referência: Compra nº {{ movimentacao.pedidoCompraId }}</p>
+            <p>
+              Referência:
+              <a [routerLink]="['/admin/compras', movimentacao.pedidoCompraId]">Compra nº {{ movimentacao.pedidoCompraId }}</a>
+            </p>
           }
           @if (movimentacao.lote || movimentacao.validade) {
             <p>

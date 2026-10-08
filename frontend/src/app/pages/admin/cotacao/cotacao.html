@@ -1,0 +1,83 @@
+<div class="cabecalho">
+  <h1>Cotação</h1>
+  <div class="atalhos">
+    <a mat-stroked-button routerLink="/admin/fornecedores">Fornecedores</a>
+    <a mat-stroked-button routerLink="/admin/compras">Compras</a>
+  </div>
+</div>
+
+<div class="filtros" role="group" aria-label="Ingrediente">
+  <label>
+    <span>Ingrediente</span>
+    <select [value]="ingredienteId() ?? ''" (change)="escolher($event)">
+      <option value="" disabled>Escolha um ingrediente</option>
+      @for (ingrediente of ingredientes(); track ingrediente.id) {
+        <option [value]="ingrediente.id">{{ ingrediente.nome }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando os preços...</p>
+} @else if (falhou()) {
+  <p class="estado" role="alert">Não deu para carregar a cotação. Tente escolher o ingrediente de novo.</p>
+} @else if (cotacao(); as cotacao) {
+  <p class="contagem">
+    {{ cotacao.ingredienteNome }} · custo atual no sistema:
+    {{ formatarCustoUnitario(cotacao.custoAtual, cotacao.unidade) }}
+  </p>
+
+  @if (cotacao.ofertas.length === 0) {
+    <p class="estado">Nenhum fornecedor ativo vende este ingrediente. Adicione-o ao catálogo de um fornecedor.</p>
+  } @else {
+    <!-- Do mais barato para o mais caro (RF-023). -->
+    <ol class="lista ofertas">
+      @for (oferta of cotacao.ofertas; track oferta.fornecedorId; let posicao = $index) {
+        <li class="linha" [class.melhor]="oferta.maisBarato">
+          <span class="posicao" aria-hidden="true">{{ posicao + 1 }}º</span>
+          <div class="dados">
+            <h2>{{ oferta.razaoSocial }}</h2>
+            <p>
+              <strong>{{ formatarCustoUnitario(oferta.preco, cotacao.unidade) }}</strong>
+              @if (oferta.telefone) {
+                · {{ oferta.telefone }}
+              }
+              @if (oferta.email) {
+                · {{ oferta.email }}
+              }
+            </p>
+          </div>
+
+          <div class="etiquetas">
+            @if (oferta.maisBarato) {
+              <span class="etiqueta ativo">Mais barato</span>
+            } @else {
+              <span class="etiqueta aviso">{{ diferenca(oferta.diferencaPercentual) }}</span>
+            }
+          </div>
+
+          <div class="botoes">
+            <a
+              mat-stroked-button
+              routerLink="/admin/compras/nova"
+              [queryParams]="{ fornecedor: oferta.fornecedorId, ingrediente: cotacao.ingredienteId }"
+            >
+              Comprar deste
+            </a>
+          </div>
+        </li>
+      }
+    </ol>
+  }
+
+  @if (cotacao.historico.length > 0) {
+    <section class="grafico-caixa">
+      <h2>Evolução do preço</h2>
+      <p class="contagem">Cada ponto é uma mudança de preço no catálogo de um fornecedor.</p>
+      <div class="grafico">
+        <canvas #grafico aria-label="Gráfico da evolução do preço por fornecedor" role="img"></canvas>
+      </div>
+    </section>
+  }
+}

@@ -1,0 +1,158 @@
+<a class="voltar" routerLink="/admin/compras">← Voltar para as compras</a>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando o pedido de compra...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar o pedido de compra. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else {
+  <div class="cabecalho">
+    <div>
+      <h1>{{ compra() ? 'Compra nº ' + compra()!.id : 'Nova compra' }}</h1>
+      @if (compra(); as atual) {
+        <p class="contagem">
+          {{ atual.fornecedorNome }} · criada em {{ atual.criadoEm | dataHora }}
+          <span [class]="classeDoStatus(atual.status)">{{ nomeDoStatus(atual.status) }}</span>
+        </p>
+      }
+    </div>
+  </div>
+
+  @if (editavel()) {
+    <!-- Pedido novo ou rascunho: da para mexer em tudo. -->
+    <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+      <div class="campos">
+        <mat-form-field appearance="outline">
+          <mat-label>Fornecedor</mat-label>
+          <mat-select [formControl]="fornecedorId" (selectionChange)="trocarFornecedor($event.value)">
+            @for (fornecedor of fornecedores(); track fornecedor.id) {
+              <mat-option [value]="fornecedor.id">{{ fornecedor.razaoSocial }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Os ingredientes vêm do catálogo dele</mat-hint>
+          @if (fornecedorId.hasError('required')) {
+            <mat-error>Escolha o fornecedor</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <h2>Itens</h2>
+      @if (fornecedorId.value && catalogo().length === 0) {
+        <p class="contagem">Este fornecedor ainda não tem ingredientes no catálogo.</p>
+      }
+
+      <ul class="itens-compra">
+        @for (linha of linhas.controls; track linha; let indice = $index) {
+          <li>
+            <mat-form-field appearance="outline" class="campo-ingrediente">
+              <mat-label>Ingrediente</mat-label>
+              <mat-select [formControl]="linha.controls.ingredienteId">
+                @for (produto of catalogo(); track produto.ingredienteId) {
+                  <mat-option [value]="produto.ingredienteId">{{ produto.ingredienteNome }}</mat-option>
+                }
+              </mat-select>
+              @if (produtoDe(linha); as produto) {
+                <mat-hint>{{ formatarCustoUnitario(produto.preco, produto.unidade) }}</mat-hint>
+              }
+              @if (linha.controls.ingredienteId.hasError('required')) {
+                <mat-error>Escolha o ingrediente</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="campo-quantidade">
+              <mat-label>Quantidade</mat-label>
+              <input matInput type="number" [formControl]="linha.controls.quantidade" min="0" step="any" />
+              <span matTextSuffix>{{ produtoDe(linha)?.unidade?.toLowerCase() }}</span>
+              @if (linha.controls.quantidade.invalid) {
+                <mat-error>Maior que zero</mat-error>
+              }
+            </mat-form-field>
+
+            <p class="subtotal">
+              <span>Subtotal</span>
+              <strong>{{ previaDe(linha) | brl }}</strong>
+            </p>
+
+            <button mat-button type="button" class="desativar" (click)="removerLinha(indice)">Remover</button>
+          </li>
+        }
+      </ul>
+
+      <button mat-stroked-button type="button" class="adicionar" (click)="adicionarLinha()">
+        Adicionar ingrediente
+      </button>
+
+      <p class="total">Total previsto: <strong>{{ previaTotal() | brl }}</strong></p>
+
+      <div class="botoes">
+        <button mat-flat-button type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Salvando...' : 'Salvar rascunho' }}
+        </button>
+        @if (compra()) {
+          <button mat-stroked-button type="button" [disabled]="enviando()" (click)="enviar()">
+            Enviar ao fornecedor
+          </button>
+          <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="cancelar()">
+            Cancelar pedido
+          </button>
+        }
+      </div>
+    </form>
+  } @else if (compra(); as atual) {
+    <!-- Enviado, recebido ou cancelado: os itens nao mudam mais. -->
+    <section class="formulario">
+      <h2>Itens</h2>
+      <ul class="itens-compra leitura">
+        @for (item of atual.itens; track item.id; let indice = $index) {
+          <li>
+            <div class="item-dados">
+              <strong>{{ item.ingredienteNome }}</strong>
+              <span>
+                {{ formatarQuantidade(item.quantidade, item.unidade) }} ×
+                {{ formatarCustoUnitario(item.precoUnitario, item.unidade) }}
+              </span>
+            </div>
+
+            @if (atual.status === 'ENVIADO') {
+              <!-- Lote e validade de cada item, para o registro de entrada (RF-028). -->
+              <mat-form-field appearance="outline" class="campo-lote">
+                <mat-label>Lote (opcional)</mat-label>
+                <input matInput [formControl]="recebimento.at(indice).controls.lote" autocomplete="off" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="campo-lote">
+                <mat-label>Validade (opcional)</mat-label>
+                <input matInput type="date" [formControl]="recebimento.at(indice).controls.validade" />
+              </mat-form-field>
+            }
+
+            <p class="subtotal">
+              <span>Subtotal</span>
+              <strong>{{ item.subtotal | brl }}</strong>
+            </p>
+          </li>
+        }
+      </ul>
+
+      <p class="total">Total: <strong>{{ atual.valorTotal | brl }}</strong></p>
+
+      @if (atual.status === 'ENVIADO') {
+        <p class="contagem">
+          Ao registrar o recebimento, cada item entra no estoque e o custo do ingrediente passa a ser o preço desta
+          compra.
+        </p>
+        <div class="botoes">
+          <button mat-flat-button type="button" [disabled]="enviando()" (click)="receber()">
+            {{ enviando() ? 'Registrando...' : 'Registrar recebimento' }}
+          </button>
+          <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="cancelar()">
+            Cancelar pedido
+          </button>
+        </div>
+      } @else if (atual.status === 'RECEBIDO') {
+        <a mat-stroked-button routerLink="/admin/estoque/movimentacoes">Ver as entradas no estoque</a>
+      }
+    </section>
+  }
+}

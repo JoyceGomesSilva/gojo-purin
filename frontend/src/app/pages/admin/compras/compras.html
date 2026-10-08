@@ -1,0 +1,85 @@
+<div class="cabecalho">
+  <h1>Compras</h1>
+  <div class="atalhos">
+    <a mat-flat-button routerLink="/admin/compras/nova">Nova compra</a>
+    <a mat-stroked-button routerLink="/admin/cotacao">Cotação</a>
+    <a mat-stroked-button routerLink="/admin/fornecedores">Fornecedores</a>
+  </div>
+</div>
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Status</span>
+    <select [value]="filtros().status" (change)="filtrar('status', $event)">
+      <option value="">Todos</option>
+      <option value="RASCUNHO">Rascunho</option>
+      <option value="ENVIADO">Enviado</option>
+      <option value="RECEBIDO">Recebido</option>
+      <option value="CANCELADO">Cancelado</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Fornecedor</span>
+    <select [value]="filtros().fornecedorId" (change)="filtrar('fornecedorId', $event)">
+      <option value="">Todos</option>
+      @for (fornecedor of fornecedores(); track fornecedor.id) {
+        <option [value]="fornecedor.id">{{ fornecedor.razaoSocial }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando as compras...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar as compras. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (compras().length === 0) {
+  <p class="estado">Nenhum pedido de compra com estes filtros.</p>
+} @else {
+  <p class="contagem">{{ total() }} {{ total() === 1 ? 'pedido de compra' : 'pedidos de compra' }}</p>
+
+  <ul class="lista">
+    @for (compra of compras(); track compra.id) {
+      <li class="linha" [class.inativo]="compra.status === 'CANCELADO'">
+        <div class="dados">
+          <h2>Compra nº {{ compra.id }}: {{ compra.fornecedorNome }}</h2>
+          <p>
+            {{ compra.criadoEm | dataHora }} · {{ compra.itens.length }}
+            {{ compra.itens.length === 1 ? 'item' : 'itens' }} · <strong>{{ compra.valorTotal | brl }}</strong>
+          </p>
+        </div>
+
+        <div class="etiquetas">
+          <span [class]="classeDoStatus(compra.status)">{{ nomeDoStatus(compra.status) }}</span>
+        </div>
+
+        <div class="botoes">
+          <a mat-stroked-button [routerLink]="['/admin/compras', compra.id]">
+            {{ compra.status === 'RASCUNHO' ? 'Editar' : compra.status === 'ENVIADO' ? 'Receber' : 'Ver' }}
+          </a>
+        </div>
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

@@ -1,0 +1,150 @@
+<div class="cabecalho">
+  <h1>Fornecedores</h1>
+  <div class="atalhos">
+    @if (!formAberto()) {
+      <button mat-flat-button type="button" (click)="novo()">Novo fornecedor</button>
+    }
+    <a mat-stroked-button routerLink="/admin/cotacao">Cotação</a>
+    <a mat-stroked-button routerLink="/admin/compras">Compras</a>
+  </div>
+</div>
+
+@if (formAberto()) {
+  <form class="formulario" [formGroup]="form" (ngSubmit)="salvar()">
+    <h2>{{ editando() ? 'Editar ' + editando()!.razaoSocial : 'Novo fornecedor' }}</h2>
+
+    <div class="campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Razão social</mat-label>
+        <input matInput formControlName="razaoSocial" autocomplete="off" />
+        @if (form.controls.razaoSocial.hasError('required')) {
+          <mat-error>Informe a razão social</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>CNPJ</mat-label>
+        <input matInput formControlName="cnpj" placeholder="00.000.000/0000-00" autocomplete="off" (blur)="pontuarCnpj()" />
+        @if (form.controls.cnpj.hasError('required')) {
+          <mat-error>Informe o CNPJ</mat-error>
+        } @else if (form.controls.cnpj.hasError('cnpj')) {
+          <mat-error>CNPJ inválido: confira os dígitos</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone (opcional)</mat-label>
+        <input matInput type="tel" formControlName="telefone" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail (opcional)</mat-label>
+        <input matInput type="email" formControlName="email" autocomplete="off" />
+        @if (form.controls.email.hasError('email')) {
+          <mat-error>E-mail inválido</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="largo">
+        <mat-label>Categorias de produtos (opcional)</mat-label>
+        <input matInput formControlName="categoriasProdutos" placeholder="Ex.: legumes, verduras, frutas" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="ATIVO">Ativo</mat-option>
+          <mat-option value="INATIVO">Inativo (sai das cotações)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="botoes">
+      <button mat-flat-button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : editando() ? 'Salvar alterações' : 'Criar fornecedor' }}
+      </button>
+      <button mat-button type="button" [disabled]="enviando()" (click)="fecharForm()">Cancelar</button>
+    </div>
+  </form>
+}
+
+<div class="filtros" role="group" aria-label="Filtros">
+  <label>
+    <span>Razão social ou CNPJ</span>
+    <input type="search" placeholder="Ex.: vale verde" [value]="filtros().busca" (change)="filtrar('busca', $event)" />
+  </label>
+
+  <label>
+    <span>Status</span>
+    <select [value]="filtros().status" (change)="filtrar('status', $event)">
+      <option value="">Todos</option>
+      <option value="ATIVO">Ativos</option>
+      <option value="INATIVO">Inativos</option>
+    </select>
+  </label>
+</div>
+
+@if (carregando()) {
+  <p class="estado" role="status">Buscando os fornecedores...</p>
+} @else if (falhou()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar os fornecedores. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (fornecedores().length === 0) {
+  <p class="estado">Nenhum fornecedor com estes filtros.</p>
+} @else {
+  <p class="contagem">
+    {{ totalFornecedores() }} {{ totalFornecedores() === 1 ? 'fornecedor' : 'fornecedores' }}
+  </p>
+
+  <ul class="lista">
+    @for (fornecedor of fornecedores(); track fornecedor.id) {
+      <li class="linha" [class.inativo]="fornecedor.status === 'INATIVO'">
+        <div class="dados">
+          <h2>{{ fornecedor.razaoSocial }}</h2>
+          <p>CNPJ {{ formatarCnpj(fornecedor.cnpj) }}</p>
+          @if (fornecedor.telefone || fornecedor.email) {
+            <p>{{ fornecedor.telefone }}{{ fornecedor.telefone && fornecedor.email ? ' · ' : '' }}{{ fornecedor.email }}</p>
+          }
+          @if (fornecedor.categoriasProdutos) {
+            <p>{{ fornecedor.categoriasProdutos }}</p>
+          }
+        </div>
+
+        <div class="etiquetas">
+          <span [class]="'etiqueta ' + fornecedor.status.toLowerCase()">
+            {{ fornecedor.status === 'ATIVO' ? 'Ativo' : 'Inativo' }}
+          </span>
+        </div>
+
+        <div class="botoes">
+          <a mat-stroked-button [routerLink]="['/admin/fornecedores', fornecedor.id, 'catalogo']">Catálogo</a>
+          <button mat-stroked-button type="button" [disabled]="enviando()" (click)="editar(fornecedor)">Editar</button>
+          @if (fornecedor.status === 'ATIVO') {
+            <button mat-button type="button" class="desativar" [disabled]="enviando()" (click)="desativar(fornecedor)">
+              Desativar
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+
+  @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Páginas">
+      <button mat-stroked-button type="button" [disabled]="pagina() === 0" (click)="irParaPagina(pagina() - 1)">
+        Anterior
+      </button>
+      <span>Página {{ pagina() + 1 }} de {{ totalPaginas() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pagina() >= totalPaginas() - 1"
+        (click)="irParaPagina(pagina() + 1)"
+      >
+        Próxima
+      </button>
+    </nav>
+  }
+}

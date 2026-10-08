@@ -91,6 +91,38 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/ingredientes/ingredientes').then((m) => m.AdminIngredientes)
       },
       {
+        // Fornecedores e compras (RF-021 a RF-026).
+        path: 'fornecedores',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/fornecedores/fornecedores').then((m) => m.AdminFornecedores)
+      },
+      {
+        path: 'fornecedores/:id/catalogo',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/catalogo/catalogo').then((m) => m.AdminCatalogo)
+      },
+      {
+        path: 'cotacao',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/cotacao/cotacao').then((m) => m.AdminCotacao)
+      },
+      {
+        path: 'compras',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/compras/compras').then((m) => m.AdminCompras)
+      },
+      {
+        // "nova" vem antes de ":id" para nao ser confundida com um numero.
+        path: 'compras/nova',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/compra/compra').then((m) => m.AdminCompra)
+      },
+      {
+        path: 'compras/:id',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/compra/compra').then((m) => m.AdminCompra)
+      },
+      {
         path: 'categorias',
         canActivate: [roleGuard('ADMIN', 'GERENTE')],
         loadComponent: () => import('./pages/admin/categorias/categorias').then((m) => m.AdminCategorias)

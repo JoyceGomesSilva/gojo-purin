@@ -1,0 +1,75 @@
+// Linhas de itens do pedido de compra.
+.itens-compra {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 16px;
+    padding: 20px 20px 8px;
+    border-radius: 16px;
+    background: var(--gp-fundo);
+  }
+
+  // Na consulta (sem campos), a linha fica mais baixa.
+  &.leitura li {
+    align-items: center;
+    padding-bottom: 20px;
+  }
+}
+
+.campo-ingrediente {
+  flex: 2 1 240px;
+}
+
+.campo-quantidade,
+.campo-lote {
+  flex: 1 1 150px;
+}
+
+.item-dados {
+  flex: 2 1 240px;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    font-size: 0.9rem;
+    color: var(--gp-tinta-suave);
+  }
+}
+
+.subtotal {
+  flex: 0 0 100px;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    font-size: 0.85rem;
+    color: var(--gp-tinta-suave);
+  }
+}
+
+.adicionar {
+  margin-bottom: 20px;
+}
+
+.total {
+  margin: 0 0 20px;
+  font-size: 1.15rem;
+
+  strong {
+    font-family: var(--gp-fonte-titulo);
+    font-weight: 400;
+  }
+}
+
+// A etiqueta de status ao lado do nome do fornecedor.
+.contagem .etiqueta {
+  margin-left: 8px;
+}
