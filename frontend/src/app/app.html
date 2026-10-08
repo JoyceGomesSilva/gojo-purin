@@ -48,6 +48,17 @@
   </svg>
 </header>
 
+<!-- Aviso que aparece quando a API demora mais de 5 segundos (servidor acordando). -->
+@if (servidor.acordando()) {
+  <div class="aviso-acordando" role="status">
+    <span class="panela" aria-hidden="true"></span>
+    <p>
+      <strong>A cozinha está acendendo o fogão.</strong>
+      Nosso servidor estava descansando e pode levar até um minuto para acordar. Já já fica pronto!
+    </p>
+  </div>
+}
+
 <main class="conteudo">
   <router-outlet />
 </main>
