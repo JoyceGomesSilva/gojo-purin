@@ -554,3 +554,33 @@ export interface FiltrosDeCompra {
   status: string;
   fornecedorId: string;
 }
+
+// ---------- Painel: dashboard ----------
+
+// Os cards de hoje (DashboardResumoResponse no back).
+export interface DashboardResumo {
+  dia: string;
+  faturamento: number;
+  pedidos: number;
+  ticketMedio: number;
+  // null enquanto nao houve venda no dia.
+  foodCost: number | null;
+  faixa: FaixaFoodCost | null;
+  alertasEstoque: number;
+}
+
+// Uma linha do top 5.
+export interface TopPrato {
+  pratoId: number;
+  nome: string;
+  quantidade: number;
+  faturamento: number;
+}
+
+// As vendas de um dia.
+export interface VendaDia {
+  dia: string;
+  pedidos: number;
+  faturamento: number;
+  ticketMedio: number;
+}

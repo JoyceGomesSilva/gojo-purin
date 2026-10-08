@@ -11,8 +11,10 @@ import { formatarCustoUnitario } from '../../../core/quantidade';
 // "registerables" registra todos de uma vez.
 Chart.register(...registerables);
 
-// Uma cor por fornecedor no grafico (as cores fortes do site).
-const CORES = ['#4a78d6', '#c2457a', '#2f8f6a', '#b7791f', '#6d6890'];
+// Uma cor por fornecedor no grafico, sempre nesta ordem. Paleta conferida
+// para daltonismo (cores distinguiveis entre si); a legenda embaixo do
+// grafico e a lista de ofertas garantem que nada dependa so da cor.
+const CORES = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4'];
 
 const formatadorDeData = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 const formatadorDePreco = new Intl.NumberFormat('pt-BR', {

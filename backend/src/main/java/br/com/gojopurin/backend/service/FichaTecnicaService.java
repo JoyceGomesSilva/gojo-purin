@@ -210,7 +210,8 @@ public class FichaTecnicaService {
     }
 
     // RF-013: verde ate 30%, amarelo ate 35%, vermelho acima disso.
-    private String faixaDe(BigDecimal foodCost) {
+    // "static" e sem "private": o DashboardService usa a mesma regra.
+    static String faixaDe(BigDecimal foodCost) {
         if (foodCost.compareTo(LIMITE_VERDE) <= 0) {
             return "VERDE";
         }

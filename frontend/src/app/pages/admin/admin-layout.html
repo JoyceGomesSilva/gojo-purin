@@ -4,6 +4,9 @@
 </div>
 
 <nav class="menu" aria-label="Seções do painel">
+  @if (gestao()) {
+    <a routerLink="/admin/dashboard" routerLinkActive="ativo">Dashboard</a>
+  }
   <a routerLink="/admin/pedidos" routerLinkActive="ativo">Pedidos</a>
   @if (gestao()) {
     <a routerLink="/admin/pratos" routerLinkActive="ativo">Cardápio</a>

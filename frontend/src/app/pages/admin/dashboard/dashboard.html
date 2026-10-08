@@ -1,0 +1,162 @@
+<div class="cabecalho">
+  <h1>Dashboard</h1>
+</div>
+
+<!-- ----- Hoje (RF-034 e RF-036) ----- -->
+@if (carregandoHoje()) {
+  <p class="estado" role="status">Buscando os números de hoje...</p>
+} @else if (falhouHoje()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar o dashboard. Espere um instante e tente de novo.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else if (resumo(); as hoje) {
+  <h2 class="secao">Hoje, {{ diaCurto(hoje.dia) }}</h2>
+
+  <div class="cards">
+    <div class="card">
+      <p class="rotulo">Faturamento</p>
+      <p class="numero">{{ hoje.faturamento | brl }}</p>
+    </div>
+    <div class="card">
+      <p class="rotulo">Pedidos</p>
+      <p class="numero">{{ hoje.pedidos }}</p>
+      <p class="nota">Cancelados não contam</p>
+    </div>
+    <div class="card">
+      <p class="rotulo">Ticket médio</p>
+      <p class="numero">{{ hoje.ticketMedio | brl }}</p>
+      <p class="nota">Faturamento ÷ pedidos</p>
+    </div>
+    <!-- A cor muda com a faixa, e o nome da faixa vai junto (nao depende so da cor). -->
+    <div [class]="'card ' + (hoje.faixa ? hoje.faixa.toLowerCase() : '')">
+      <p class="rotulo">Food cost</p>
+      @if (hoje.foodCost !== null && hoje.faixa) {
+        <p class="numero">{{ porcento(hoje.foodCost) }}</p>
+        <p class="nota">{{ nomeDaFaixa(hoje.faixa) }}</p>
+      } @else {
+        <p class="numero">–</p>
+        <p class="nota">Aparece depois da primeira venda do dia</p>
+      }
+    </div>
+  </div>
+
+  <!-- RF-036: ingredientes criticos direto no dashboard. -->
+  <section [class]="'painel-alertas ' + (alertas().length > 0 ? 'com-alertas' : '')">
+    <div class="painel-titulo">
+      <h2>Estoque</h2>
+      <a mat-stroked-button routerLink="/admin/estoque">Abrir estoque</a>
+    </div>
+    @if (alertas().length === 0) {
+      <p>Todos os ingredientes estão acima do mínimo.</p>
+    } @else {
+      <p>
+        <strong>
+          {{ alertas().length }}
+          {{ alertas().length === 1 ? 'ingrediente abaixo do mínimo' : 'ingredientes abaixo do mínimo' }}
+        </strong>
+      </p>
+      <ul>
+        @for (alerta of alertas().slice(0, 5); track alerta.ingredienteId) {
+          <li>
+            {{ alerta.nome }}: há {{ formatarQuantidade(alerta.saldo, alerta.unidade) }}, o mínimo é
+            {{ formatarQuantidade(alerta.estoqueMinimo, alerta.unidade) }} ·
+            <a routerLink="/admin/cotacao" [queryParams]="{ ingrediente: alerta.ingredienteId }">ver cotação</a>
+          </li>
+        }
+      </ul>
+      @if (alertas().length > 5) {
+        <p class="nota">E mais {{ alertas().length - 5 }} no estoque.</p>
+      }
+    }
+  </section>
+}
+
+<!-- ----- Periodo (RF-035 e RF-037) ----- -->
+<h2 class="secao">Vendas por período</h2>
+
+<div class="filtros" role="group" aria-label="Período">
+  <label>
+    <span>De</span>
+    <input type="date" [value]="de()" [max]="ate()" (change)="mudarData('de', $event)" />
+  </label>
+  <label>
+    <span>Até</span>
+    <input type="date" [value]="ate()" [min]="de()" (change)="mudarData('ate', $event)" />
+  </label>
+  <button mat-stroked-button type="button" (click)="ultimosDias(7)">Últimos 7 dias</button>
+  <button mat-stroked-button type="button" (click)="ultimosDias(30)">Últimos 30 dias</button>
+</div>
+
+@if (carregandoPeriodo()) {
+  <p class="estado" role="status">Buscando as vendas do período...</p>
+} @else if (falhouPeriodo()) {
+  <div class="estado" role="alert">
+    <p>Não deu para carregar as vendas do período.</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">Tentar de novo</button>
+  </div>
+} @else {
+  <div class="graficos">
+    <section class="caixa">
+      <h2>Top 5 pratos mais vendidos</h2>
+      @if (top().length === 0) {
+        <p class="nota">Nenhuma venda neste período.</p>
+      } @else {
+        <div class="grafico baixo">
+          <canvas #graficoTop role="img" aria-label="Gráfico de barras dos 5 pratos mais vendidos"></canvas>
+        </div>
+        <!-- Os mesmos numeros em texto, para quem nao enxerga o grafico. -->
+        <ol class="ranking">
+          @for (prato of top(); track prato.pratoId) {
+            <li>
+              <span>{{ prato.nome }}</span>
+              <span>{{ prato.quantidade }} un. · {{ prato.faturamento | brl }}</span>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
+    <section class="caixa">
+      <h2>Faturamento por dia</h2>
+      <div class="grafico">
+        <canvas #graficoVendas role="img" aria-label="Gráfico de linha do faturamento por dia"></canvas>
+      </div>
+    </section>
+  </div>
+
+  <!-- RF-037: tabela resumo do periodo. -->
+  <section class="caixa">
+    <h2>Resumo do período</h2>
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Dia</th>
+            <th scope="col">Pedidos</th>
+            <th scope="col">Faturamento</th>
+            <th scope="col">Ticket médio</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (dia of vendas(); track dia.dia) {
+            <tr>
+              <td>{{ diaCurto(dia.dia) }}</td>
+              <td>{{ dia.pedidos }}</td>
+              <td>{{ dia.faturamento | brl }}</td>
+              <td>{{ dia.ticketMedio | brl }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row">Total</th>
+            <td>{{ totalPedidos() }}</td>
+            <td>{{ totalFaturamento() | brl }}</td>
+            <td>{{ ticketDoPeriodo() | brl }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+}

@@ -1,0 +1,180 @@
+.secao {
+  margin: 0 0 16px;
+  font-family: var(--gp-fonte-titulo);
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+
+// ----- Cards de hoje -----
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.card {
+  padding: 20px 24px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  p {
+    margin: 0;
+  }
+
+  // RF-013 de novo: a mesma cor da ficha tecnica para cada faixa.
+  &.verde {
+    background: var(--gp-menta);
+  }
+
+  &.amarelo {
+    background: var(--gp-amarelo);
+  }
+
+  &.vermelho {
+    background: var(--gp-rosa);
+  }
+}
+
+.rotulo {
+  font-weight: 700;
+  color: var(--gp-tinta-suave);
+}
+
+.numero {
+  font-family: var(--gp-fonte-titulo);
+  font-size: 1.9rem;
+  line-height: 1.3;
+}
+
+.nota {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--gp-tinta-suave);
+}
+
+// ----- Alertas de estoque -----
+.painel-alertas {
+  margin-bottom: 44px;
+  padding: 20px 24px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  &.com-alertas {
+    background: var(--gp-rosa);
+    border-color: var(--gp-rosa);
+  }
+
+  p {
+    margin: 0 0 8px;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+}
+
+.painel-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+// ----- Graficos e tabela -----
+.graficos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.caixa {
+  padding: 24px;
+  background: var(--gp-papel);
+  border: 2px solid var(--gp-linha);
+  border-radius: 24px;
+
+  h2 {
+    margin: 0 0 16px;
+  }
+}
+
+// O Chart.js ocupa o tamanho desta caixa.
+.grafico {
+  position: relative;
+  height: 280px;
+
+  &.baixo {
+    height: 220px;
+  }
+}
+
+.ranking {
+  margin: 16px 0 0;
+  padding-left: 22px;
+
+  li {
+    padding: 4px 0;
+  }
+
+  li span:last-child {
+    float: right;
+    color: var(--gp-tinta-suave);
+  }
+}
+
+// A tabela rola para o lado em tela estreita, sem quebrar a pagina.
+.tabela-rolagem {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 10px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--gp-linha);
+    white-space: nowrap;
+  }
+
+  th:first-child,
+  td:first-child {
+    text-align: left;
+  }
+
+  thead th {
+    color: var(--gp-tinta-suave);
+  }
+
+  tfoot th,
+  tfoot td {
+    font-weight: 700;
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .graficos {
+    grid-template-columns: 1fr;
+  }
+
+  .caixa,
+  .card,
+  .painel-alertas {
+    padding: 20px;
+  }
+}

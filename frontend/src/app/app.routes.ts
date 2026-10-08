@@ -62,6 +62,12 @@ export const routes: Routes = [
           import('./pages/admin/pedido-detalhe/pedido-detalhe').then((m) => m.AdminPedidoDetalhe)
       },
       {
+        // Dashboard (RF-034 a RF-037): so ADMIN e GERENTE.
+        path: 'dashboard',
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
+        loadComponent: () => import('./pages/admin/dashboard/dashboard').then((m) => m.AdminDashboard)
+      },
+      {
         // Cardapio: so ADMIN e GERENTE. O cozinheiro nao entra.
         path: 'pratos',
         canActivate: [roleGuard('ADMIN', 'GERENTE')],
